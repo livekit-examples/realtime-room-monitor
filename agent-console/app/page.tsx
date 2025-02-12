@@ -110,7 +110,7 @@ function ControlBar(props: { onConnectButtonClicked: () => void; agentState: Age
         )}
       </AnimatePresence>
       <AnimatePresence>
-        {props.agentState !== "disconnected" && props.agentState !== "connecting" && (
+        {props.agentState !== "disconnected" && (
           <motion.div
             initial={{ opacity: 0, top: "10px" }}
             animate={{ opacity: 1, top: 0 }}
