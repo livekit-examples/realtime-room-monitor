@@ -9,10 +9,16 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@livekit/components-react": "^2.8.1",
+    "@livekit/components-styles": "^1.1.4",
+    "@livekit/krisp-noise-filter": "^0.2.16",
     "@radix-ui/react-slot": "^1.1.2",
     "@tailwindcss/postcss": "^4.0.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "framer-motion": "^12.4.2",
+    "livekit-client": "^2.9.1",
+    "livekit-server-sdk": "^2.10.0",
     "lucide-react": "^0.475.0",
     "next": "15.1.7",
     "react": "^19.0.0",
