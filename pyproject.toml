@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "voxant"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+livekit-agents = "^0.12.12"
+langgraph = "^0.2.71"
+langchain-core = "^0.3.34"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
