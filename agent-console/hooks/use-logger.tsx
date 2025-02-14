@@ -20,7 +20,7 @@ export const { useLogger, renderEventLog, getEventLevel, getEventMessage } = cre
 });
 
 export const renderJson = (data: unknown) => (
-  <pre className="text-xs bg-gray-50 p-2 rounded-md overflow-x-auto">
+  <pre className="text-xs bg-zinc-50 p-2 rounded-md overflow-x-auto dark:bg-zinc-900">
     {typeof data === "object"
       ? JSON.stringify(data, null, 2)
       : JSON.stringify({ value: data }, null, 2)}

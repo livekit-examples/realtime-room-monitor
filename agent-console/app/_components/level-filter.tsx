@@ -28,7 +28,7 @@ export const LevelFilter = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="gap-2">
-          <span>Filter Levels</span>
+          <span>Levels</span>
           <span className="text-muted-foreground/70">
             ({numSelectedLevels === 3 ? "All" : numSelectedLevels})
           </span>

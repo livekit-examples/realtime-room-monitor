@@ -1,3 +1,5 @@
+"use client";
+import { ThemePicker } from "@/components/theme-picker";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -99,77 +101,87 @@ export const ConsoleContainer = () => {
   }, [appendLog]);
 
   return (
-    <div className="w-full h-full flex flex-row">
-      <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel className="p-4 min-w-[565px] max-w-[876px]">
-          <div className="mb-4 flex items-center justify-between gap-2">
-            <LevelFilter
-              displayInfo={displayInfo}
-              displayWarn={displayWarn}
-              displayError={displayError}
-              setDisplayInfo={setDisplayInfo}
-              setDisplayWarn={setDisplayWarn}
-              setDisplayError={setDisplayError}
-              numSelectedLevels={numSelectedLevels}
-            />
-            <Input
-              placeholder="Filter logs..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-            <TooltipProvider delayDuration={0}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <WideSwitch checked={expandAll} onCheckedChange={setExpandAll} />
-                </TooltipTrigger>
-                <TooltipContent className="dark px-2 py-1 text-xs">
-                  {expandAll ? "Collapse all logs" : "Expand all logs"}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <div className="h-6 w-px bg-border" />
-            <Button variant="destructive" onClick={() => clear()} className="h-9 px-4">
-              Clear All
-            </Button>
-          </div>
-          <div className="h-[calc(100%-52px)] overflow-y-auto border rounded-lg bg-white shadow-sm">
-            {filteredLogs.map((logEntry, index) => (
-              <div
-                key={index}
-                className="flex flex-col gap-2 py-3 px-3 bg-white shadow-sm border-b"
-              >
-                <div className="flex items-center">
-                  <span className="text-sm text-muted-foreground mr-12">
-                    {formatDate(logEntry.timestamp)}
-                  </span>
-                  <div className="flex items-center w-18 mr-2">
-                    {getSourceIcon(logEntry.source)}
-                    <code className="text-xs font-medium text-muted-foreground">
-                      {logEntry.source}
+    <div className="w-full h-full flex flex-row" suppressHydrationWarning>
+      {typeof window === "undefined" ? null : (
+        <ResizablePanelGroup direction="horizontal">
+          <ResizablePanel className="p-4 min-w-[565px] max-w-[876px]">
+            <div className="mb-4 flex items-center justify-between gap-2">
+              <LevelFilter
+                displayInfo={displayInfo}
+                displayWarn={displayWarn}
+                displayError={displayError}
+                setDisplayInfo={setDisplayInfo}
+                setDisplayWarn={setDisplayWarn}
+                setDisplayError={setDisplayError}
+                numSelectedLevels={numSelectedLevels}
+              />
+              <Input
+                placeholder="Filter logs..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+              <TooltipProvider delayDuration={0}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <WideSwitch checked={expandAll} onCheckedChange={setExpandAll} />
+                  </TooltipTrigger>
+                  <TooltipContent className="dark px-2 py-1 text-xs">
+                    {expandAll ? "Collapse all logs" : "Expand all logs"}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <div className="h-6 w-px bg-border" />
+              <Button variant="destructive" onClick={() => clear()} className="h-9 px-4">
+                Clear All
+              </Button>
+            </div>
+            <div className="h-[calc(100%-52px)] overflow-y-auto border rounded-lg shadow-sm">
+              {filteredLogs.map((logEntry, index) => (
+                <div key={index} className="flex flex-col gap-2 py-3 px-3 shadow-sm border-b">
+                  <div className="flex items-center">
+                    <span className="text-sm text-muted-foreground mr-12">
+                      {formatDate(logEntry.timestamp)}
+                    </span>
+                    <div className="flex items-center w-18 mr-2">
+                      {getSourceIcon(logEntry.source)}
+                      <code className="text-xs font-medium text-muted-foreground">
+                        {logEntry.source}
+                      </code>
+                    </div>
+                    <code className={cn("text-[0.75em] px-1.5 py-[2px] rounded")}>
+                      {getEventMessage(logEntry)}
                     </code>
+                    <div className="flex-1" />
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        getEventLevelColor(getEventLevel(logEntry)),
+                        "rounded-sm w-12 flex items-center justify-center"
+                      )}
+                    >
+                      {getEventLevel(logEntry)}
+                    </Badge>
                   </div>
-                  <code className={cn("text-[0.75em] px-1.5 py-[2px] rounded")}>
-                    {getEventMessage(logEntry)}
-                  </code>
-                  <div className="flex-1" />
-                  <Badge
-                    variant="outline"
-                    className={cn(
-                      getEventLevelColor(getEventLevel(logEntry)),
-                      "rounded-sm w-12 flex items-center justify-center"
-                    )}
-                  >
-                    {getEventLevel(logEntry)}
-                  </Badge>
+                  {expandAll && renderEventLog(logEntry)}
                 </div>
-                {expandAll && renderEventLog(logEntry)}
+              ))}
+            </div>
+          </ResizablePanel>
+          <ResizableHandle withHandle />
+          <ResizablePanel>
+            <div className="p-6 h-full flex flex-col gap-6">
+              <div className="space-y-2">
+                <h2 className="text-lg font-bold">Appearance Settings</h2>
+                <p className="text-sm text-muted-foreground">Customize the interface appearance</p>
               </div>
-            ))}
-          </div>
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel>{/* Right panel content */}</ResizablePanel>
-      </ResizablePanelGroup>
+
+              <div className="rounded-lg border bg-background p-6 shadow-sm bg-muted/30">
+                <ThemePicker />
+              </div>
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      )}
     </div>
   );
 };
