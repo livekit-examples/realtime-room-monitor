@@ -1,18 +1,50 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
-import { getEventColor, renderEventLog, useLogger } from "@/hooks/use-logger";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { WideSwitch } from "@/components/wide-switch";
+import { getEventLevel, renderEventLog, useLogger } from "@/hooks/use-logger";
+import { EventLevel } from "@/lib/event-registry";
 import { EventType } from "@/lib/event-types";
 import { cn, formatDate } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import { LevelFilter } from "./level-filter";
+const getEventLevelColor = (level: EventLevel) => {
+  switch (level) {
+    case "info":
+      return "bg-blue-100 text-blue-800";
+    case "warn":
+      return "bg-yellow-100 text-yellow-800";
+    case "error":
+      return "bg-red-100 text-red-800";
+  }
+};
 
 export const ConsoleContainer = () => {
   const { logs, appendLog, clear } = useLogger();
   const [query, setQuery] = useState("");
+  const [expandAll, setExpandAll] = useState<boolean>(true);
+
+  // Level filter
+  const [displayInfo, setDisplayInfo] = useState(true);
+  const [displayWarn, setDisplayWarn] = useState(true);
+  const [displayError, setDisplayError] = useState(true);
+
+  const numSelectedLevels = Object.values({
+    displayInfo,
+    displayWarn,
+    displayError,
+  }).filter(Boolean).length;
 
   const filteredLogs = logs.filter((log) => {
     const logMessage = JSON.stringify(log.data);
-    return logMessage.toLowerCase().includes(query.toLowerCase());
+    return (
+      (logMessage.toLowerCase().includes(query.toLowerCase()) &&
+        displayInfo &&
+        getEventLevel(log) === "info") ||
+      (displayWarn && getEventLevel(log) === "warn") ||
+      (displayError && getEventLevel(log) === "error")
+    );
   });
 
   useEffect(() => {
@@ -24,47 +56,65 @@ export const ConsoleContainer = () => {
     appendLog(EventType.System_ParticipantDisconnected, {
       id: "123",
     });
+
+    appendLog("system.participant_reconnected", {
+      id: "123",
+    });
   }, [appendLog]);
 
   return (
     <div className="w-full h-full flex flex-row">
       <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel className="max-w-[700px] min-w-[300px] p-4">
-          <div className="mb-4 flex gap-2">
+        <ResizablePanel className="p-4 min-w-[565px] max-w-[876px]">
+          <div className="mb-4 flex items-center justify-between gap-2">
+            <LevelFilter
+              displayInfo={displayInfo}
+              displayWarn={displayWarn}
+              displayError={displayError}
+              setDisplayInfo={setDisplayInfo}
+              setDisplayWarn={setDisplayWarn}
+              setDisplayError={setDisplayError}
+              numSelectedLevels={numSelectedLevels}
+            />
             <Input
               placeholder="Filter logs..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="flex-1"
             />
-            <Button variant="destructive" onClick={() => clear()} className="shrink-0">
-              Clear Logs
+            <TooltipProvider delayDuration={0}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <WideSwitch checked={expandAll} onCheckedChange={setExpandAll} />
+                </TooltipTrigger>
+                <TooltipContent className="dark px-2 py-1 text-xs">
+                  {expandAll ? "Collapse all logs" : "Expand all logs"}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <div className="h-6 w-px bg-border" />
+            <Button variant="destructive" onClick={() => clear()} className="h-9 px-4">
+              Clear All
             </Button>
           </div>
           <div className="h-[calc(100%-60px)] overflow-y-auto space-y-2">
-            {filteredLogs.map((logEntry, index) => {
-              const displayName = logEntry.eventType
-                .replace(/([a-z])([A-Z])/g, "$1 $2")
-                .replace(/_/g, " ")
-                .toLowerCase()
-                .replace(/(^\w| \w)/g, (m) => m.toUpperCase());
-
-              return (
-                <div key={index} className="p-3 border rounded-lg bg-white shadow-sm">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-sm text-muted-foreground">
-                      {formatDate(logEntry.timestamp)}
-                    </span>
-                    <code
-                      className={cn("text-[0.75em] px-1.5 py-0.5 rounded", getEventColor(logEntry))}
-                    >
-                      #{displayName}
-                    </code>
-                  </div>
-                  {renderEventLog(logEntry)}
+            {filteredLogs.map((logEntry, index) => (
+              <div key={index} className="p-3 border rounded-lg bg-white shadow-sm">
+                <div className="flex items-center gap-8">
+                  <span className="text-sm text-muted-foreground">
+                    {formatDate(logEntry.timestamp)}
+                  </span>
+                  <code
+                    className={cn(
+                      "text-[0.75em] px-1.5 py-[2px] rounded",
+                      getEventLevelColor(getEventLevel(logEntry))
+                    )}
+                  >
+                    {logEntry.eventType}
+                  </code>
                 </div>
-              );
-            })}
+                {expandAll && renderEventLog(logEntry)}
+              </div>
+            ))}
           </div>
         </ResizablePanel>
         <ResizableHandle withHandle />

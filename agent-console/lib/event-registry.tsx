@@ -1,10 +1,12 @@
 import React from "react";
 import { create } from "zustand";
 
-type EventRenderer<T extends object> = (data: T) => React.ReactNode;
+export type EventRenderer<T extends object> = (data: T) => React.ReactNode;
 
-interface EventDefinition<TData extends object> {
-  color: string;
+export type EventLevel = "info" | "warn" | "error";
+
+export interface EventDefinition<TData extends object> {
+  level: EventLevel;
   render: EventRenderer<TData>;
 }
 
@@ -59,16 +61,16 @@ export function createEventRegistry<T extends Record<string, EventDefinition<any
     return render?.(data);
   };
 
-  const getEventColor = (log: LogEntry<EventKey>) => {
+  const getEventLevel = (log: LogEntry<EventKey>) => {
     const { eventType } = log;
     const eventDefinition = config[eventType];
-    const { color } = eventDefinition;
-    return color;
+    const { level } = eventDefinition;
+    return level;
   };
 
   return {
     useLogger: useStore,
     renderEventLog,
-    getEventColor,
+    getEventLevel,
   };
 }
