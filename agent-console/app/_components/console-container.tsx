@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { getEventColor, renderEventLog, useLogger } from "@/hooks/use-logger";
 import { EventType } from "@/lib/event-types";
@@ -29,19 +31,15 @@ export const ConsoleContainer = () => {
       <ResizablePanelGroup direction="horizontal">
         <ResizablePanel className="max-w-[700px] min-w-[300px] p-4">
           <div className="mb-4 flex gap-2">
-            <input
-              type="text"
+            <Input
               placeholder="Filter logs..."
-              className="w-full p-2 border rounded-lg"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              className="flex-1"
             />
-            <button
-              onClick={() => clear()}
-              className="px-4 py-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200"
-            >
-              Clear
-            </button>
+            <Button variant="destructive" onClick={() => clear()} className="shrink-0">
+              Clear Logs
+            </Button>
           </div>
           <div className="h-[calc(100%-60px)] overflow-y-auto space-y-2">
             {filteredLogs.map((logEntry, index) => {
@@ -57,14 +55,11 @@ export const ConsoleContainer = () => {
                     <span className="text-sm text-muted-foreground">
                       {formatDate(logEntry.timestamp)}
                     </span>
-                    <span
-                      className={cn(
-                        "px-2 py-1 rounded-full text-xs font-medium",
-                        getEventColor(logEntry) || "bg-gray-100 text-gray-800"
-                      )}
+                    <code
+                      className={cn("text-[0.75em] px-1.5 py-0.5 rounded", getEventColor(logEntry))}
                     >
-                      {displayName}
-                    </span>
+                      #{displayName}
+                    </code>
                   </div>
                   {renderEventLog(logEntry)}
                 </div>
