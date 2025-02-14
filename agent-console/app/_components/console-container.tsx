@@ -39,14 +39,20 @@ export const ConsoleContainer = () => {
   }).filter(Boolean).length;
 
   const filteredLogs = logs.filter((log) => {
-    const logMessage = JSON.stringify(log.data);
-    return (
-      (logMessage.toLowerCase().includes(query.toLowerCase()) &&
-        displayInfo &&
-        getEventLevel(log) === "info") ||
-      (displayWarn && getEventLevel(log) === "warn") ||
-      (displayError && getEventLevel(log) === "error")
-    );
+    const searchQuery = [
+      getEventMessage(log),
+      getEventLevel(log),
+      log.eventType,
+      JSON.stringify(log.data),
+    ];
+
+    const filtered = searchQuery.some((q) => q.toLowerCase().includes(query.toLowerCase()));
+    const shouldDisplay =
+      filtered &&
+      ((displayInfo && getEventLevel(log) === "info") ||
+        (displayWarn && getEventLevel(log) === "warn") ||
+        (displayError && getEventLevel(log) === "error"));
+    return shouldDisplay;
   });
 
   useEffect(() => {
