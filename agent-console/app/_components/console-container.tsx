@@ -1,29 +1,31 @@
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { WideSwitch } from "@/components/wide-switch";
-import { getEventLevel, renderEventLog, useLogger } from "@/hooks/use-logger";
+import { getEventLevel, getEventMessage, renderEventLog, useLogger } from "@/hooks/use-logger";
 import { EventLevel } from "@/lib/event-registry";
 import { EventType } from "@/lib/event-types";
 import { cn, formatDate } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { LevelFilter } from "./level-filter";
+
 const getEventLevelColor = (level: EventLevel) => {
   switch (level) {
     case "info":
-      return "bg-blue-100 text-blue-800";
+      return "bg-blue-100 text-blue-800 border-blue-300";
     case "warn":
-      return "bg-yellow-100 text-yellow-800";
+      return "bg-yellow-100 text-yellow-800 border-yellow-300";
     case "error":
-      return "bg-red-100 text-red-800";
+      return "bg-red-100 text-red-800 border-red-300";
   }
 };
 
 export const ConsoleContainer = () => {
   const { logs, appendLog, clear } = useLogger();
   const [query, setQuery] = useState("");
-  const [expandAll, setExpandAll] = useState<boolean>(true);
+  const [expandAll, setExpandAll] = useState<boolean>(false);
 
   // Level filter
   const [displayInfo, setDisplayInfo] = useState(true);
@@ -55,6 +57,7 @@ export const ConsoleContainer = () => {
 
     appendLog(EventType.System_ParticipantDisconnected, {
       id: "123",
+      name: "John Doe",
     });
 
     appendLog("system.participant_reconnected", {
@@ -98,18 +101,25 @@ export const ConsoleContainer = () => {
           </div>
           <div className="h-[calc(100%-60px)] overflow-y-auto space-y-2">
             {filteredLogs.map((logEntry, index) => (
-              <div key={index} className="p-3 border rounded-lg bg-white shadow-sm">
-                <div className="flex items-center gap-8">
-                  <span className="text-sm text-muted-foreground">
+              <div
+                key={index}
+                className="flex flex-col gap-2 p-3 border rounded-lg bg-white shadow-sm"
+              >
+                <div className="flex items-center">
+                  <span className="text-sm text-muted-foreground mr-16">
                     {formatDate(logEntry.timestamp)}
                   </span>
-                  <code
+                  <Badge
+                    variant="outline"
                     className={cn(
-                      "text-[0.75em] px-1.5 py-[2px] rounded",
-                      getEventLevelColor(getEventLevel(logEntry))
+                      getEventLevelColor(getEventLevel(logEntry)),
+                      "rounded-sm w-12 flex items-center justify-center mr-1.5"
                     )}
                   >
-                    {logEntry.eventType}
+                    {getEventLevel(logEntry)}
+                  </Badge>
+                  <code className={cn("text-[0.75em] px-1.5 py-[2px] rounded")}>
+                    {getEventMessage(logEntry)}
                   </code>
                 </div>
                 {expandAll && renderEventLog(logEntry)}

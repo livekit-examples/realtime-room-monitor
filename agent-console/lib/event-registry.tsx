@@ -7,6 +7,7 @@ export type EventLevel = "info" | "warn" | "error";
 
 export interface EventDefinition<TData extends object> {
   level: EventLevel;
+  message: string | ((data: TData) => string);
   render: EventRenderer<TData>;
 }
 
@@ -68,9 +69,17 @@ export function createEventRegistry<T extends Record<string, EventDefinition<any
     return level;
   };
 
+  const getEventMessage = (log: LogEntry<EventKey>) => {
+    const { eventType, data } = log;
+    const eventDefinition = config[eventType];
+    const { message } = eventDefinition;
+    return typeof message === "function" ? message(data) : message;
+  };
+
   return {
     useLogger: useStore,
     renderEventLog,
     getEventLevel,
+    getEventMessage,
   };
 }
