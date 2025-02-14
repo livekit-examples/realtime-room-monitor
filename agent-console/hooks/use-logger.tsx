@@ -1,30 +1,21 @@
 import { createEventRegistry } from "@/lib/event-registry";
 import { EventType } from "@/lib/event-types";
 
-// Define proper type for event data
-interface ParticipantConnectedData {
-  id: string;
-  name?: string;
-}
-
-const { useLogger } = createEventRegistry({
+export const { useLogger, renderEventLog, getEventColor } = createEventRegistry({
   [EventType.System_ParticipantConnected]: {
     color: "bg-blue-100 text-blue-800",
-    render: (data: ParticipantConnectedData) => (
-      <div className="bg-blue-100 text-blue-800 p-2 rounded">
-        <div>Participant Connected: {data.id}</div>
-        {data.name && <div>Name: {data.name}</div>}
-      </div>
-    ),
+    render: ({ id, name }: { id: string; name?: string }) => renderJson({ id, name }),
   },
   [EventType.System_ParticipantDisconnected]: {
     color: "bg-red-100 text-red-800",
-    render: (data: { id: string }) => (
-      <div className="bg-red-100 text-red-800 p-2 rounded">
-        <div>Participant Disconnected: {data.id}</div>
-      </div>
-    ),
+    render: ({ id }: { id: string }) => renderJson({ id }),
   },
 });
 
-export default useLogger;
+export const renderJson = (data: unknown) => (
+  <pre className="text-xs bg-gray-50 p-2 rounded-md overflow-x-auto">
+    {typeof data === "object"
+      ? JSON.stringify(data, null, 2)
+      : JSON.stringify({ value: data }, null, 2)}
+  </pre>
+);

@@ -1,13 +1,28 @@
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
-import { useLogger } from "@/hooks/use-logger";
-import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { getEventColor, renderEventLog, useLogger } from "@/hooks/use-logger";
+import { EventType } from "@/lib/event-types";
+import { cn, formatDate } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 export const ConsoleContainer = () => {
-  const { logs, filter } = useLogger();
+  const { logs, appendLog, clear } = useLogger();
   const [query, setQuery] = useState("");
 
-  const filteredLogs = filter(query);
+  const filteredLogs = logs.filter((log) => {
+    const logMessage = JSON.stringify(log.data);
+    return logMessage.toLowerCase().includes(query.toLowerCase());
+  });
+
+  useEffect(() => {
+    appendLog(EventType.System_ParticipantConnected, {
+      id: "123",
+      name: "John Doe",
+    });
+
+    appendLog(EventType.System_ParticipantDisconnected, {
+      id: "123",
+    });
+  }, [appendLog]);
 
   return (
     <div className="w-full h-full flex flex-row">
@@ -22,15 +37,15 @@ export const ConsoleContainer = () => {
               onChange={(e) => setQuery(e.target.value)}
             />
             <button
-              onClick={() => useLogger.getState().clearLogs()}
+              onClick={() => clear()}
               className="px-4 py-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200"
             >
               Clear
             </button>
           </div>
           <div className="h-[calc(100%-60px)] overflow-y-auto space-y-2">
-            {filteredLogs.map((log, index) => {
-              const displayName = log.eventType
+            {filteredLogs.map((logEntry, index) => {
+              const displayName = logEntry.eventType
                 .replace(/([a-z])([A-Z])/g, "$1 $2")
                 .replace(/_/g, " ")
                 .toLowerCase()
@@ -40,24 +55,18 @@ export const ConsoleContainer = () => {
                 <div key={index} className="p-3 border rounded-lg bg-white shadow-sm">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-sm text-muted-foreground">
-                      {log.timestamp.toLocaleTimeString()}
+                      {formatDate(logEntry.timestamp)}
                     </span>
                     <span
                       className={cn(
                         "px-2 py-1 rounded-full text-xs font-medium",
-                        events[log.eventType]?.color || "bg-gray-100 text-gray-800"
+                        getEventColor(logEntry) || "bg-gray-100 text-gray-800"
                       )}
                     >
                       {displayName}
                     </span>
                   </div>
-                  {events[log.eventType]?.render?.(log.data) || (
-                    <pre className="text-xs bg-gray-50 p-2 rounded-md overflow-x-auto">
-                      {typeof log.data === "object"
-                        ? JSON.stringify(log.data, null, 2)
-                        : JSON.stringify({ value: log.data }, null, 2)}
-                    </pre>
-                  )}
+                  {renderEventLog(logEntry)}
                 </div>
               );
             })}
