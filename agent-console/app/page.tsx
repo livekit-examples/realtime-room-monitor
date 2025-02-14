@@ -1,13 +1,10 @@
 "use client";
 
-import { CloseIcon } from "@/components/close-icon";
-import { NoAgentNotification } from "@/components/no-agent-notification";
 import {
   AgentState,
   BarVisualizer,
   DisconnectButton,
   LiveKitRoom,
-  RoomAudioRenderer,
   useVoiceAssistant,
   VoiceAssistantControlBar,
 } from "@livekit/components-react";
@@ -15,6 +12,7 @@ import { useKrispNoiseFilter } from "@livekit/components-react/krisp";
 import { AnimatePresence, motion } from "framer-motion";
 import { MediaDeviceFailure } from "livekit-client";
 import { useCallback, useEffect, useState } from "react";
+import { ConsoleContainer } from "./_components/console-container";
 import type { ConnectionDetails } from "./api/connection-details/route";
 
 export default function Page() {
@@ -43,8 +41,9 @@ export default function Page() {
   }, []);
 
   return (
-    <main data-lk-theme="default" className="h-full grid content-center bg-[var(--lk-bg)]">
+    <main className="h-full w-full bg-background">
       <LiveKitRoom
+        className="w-full h-full"
         token={connectionDetails?.participantToken}
         serverUrl={connectionDetails?.serverUrl}
         connect={connectionDetails !== undefined}
@@ -54,12 +53,12 @@ export default function Page() {
         onDisconnected={() => {
           updateConnectionDetails(undefined);
         }}
-        className="grid grid-rows-[2fr_1fr] items-center"
       >
-        <SimpleVoiceAssistant onStateChange={setAgentState} />
+        {/* <SimpleVoiceAssistant onStateChange={setAgentState} />
         <ControlBar onConnectButtonClicked={onConnectButtonClicked} agentState={agentState} />
         <RoomAudioRenderer />
-        <NoAgentNotification state={agentState} />
+        <NoAgentNotification state={agentState} /> */}
+        <ConsoleContainer />
       </LiveKitRoom>
     </main>
   );
@@ -119,9 +118,7 @@ function ControlBar(props: { onConnectButtonClicked: () => void; agentState: Age
             className="flex h-8 absolute left-1/2 -translate-x-1/2  justify-center"
           >
             <VoiceAssistantControlBar controls={{ leave: false }} />
-            <DisconnectButton>
-              <CloseIcon />
-            </DisconnectButton>
+            <DisconnectButton className="bg-blue-500">123</DisconnectButton>
           </motion.div>
         )}
       </AnimatePresence>

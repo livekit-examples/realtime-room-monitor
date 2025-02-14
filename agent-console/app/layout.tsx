@@ -1,4 +1,3 @@
-import "@livekit/components-styles";
 import { Public_Sans } from "next/font/google";
 import "./globals.css";
 
