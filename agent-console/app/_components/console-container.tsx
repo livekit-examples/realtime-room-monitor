@@ -5,9 +5,10 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/componen
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { WideSwitch } from "@/components/wide-switch";
 import { getEventLevel, getEventMessage, renderEventLog, useLogger } from "@/hooks/use-logger";
-import { EventLevel } from "@/lib/event-registry";
+import { EventLevel, EventSource } from "@/lib/event-registry";
 import { EventType } from "@/lib/event-types";
 import { cn, formatDate } from "@/lib/utils";
+import { ArrowDownCircle, ArrowUpCircle, Server, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 import { LevelFilter } from "./level-filter";
 
@@ -19,6 +20,20 @@ const getEventLevelColor = (level: EventLevel) => {
       return "bg-yellow-100 text-yellow-800 border-yellow-300";
     case "error":
       return "bg-red-100 text-red-800 border-red-300";
+  }
+};
+
+const getSourceIcon = (source: EventSource) => {
+  const baseClass = "h-4 w-4 mr-2";
+  switch (source) {
+    case "server":
+      return <ArrowDownCircle className={`${baseClass} text-green-600`} />;
+    case "client":
+      return <ArrowUpCircle className={`${baseClass} text-blue-600`} />;
+    case "system":
+      return <Settings className={`${baseClass} text-purple-600`} />;
+    default:
+      return <Server className={`${baseClass} text-gray-600`} />;
   }
 };
 
@@ -56,19 +71,31 @@ export const ConsoleContainer = () => {
   });
 
   useEffect(() => {
-    appendLog(EventType.System_ParticipantConnected, {
-      id: "123",
-      name: "John Doe",
-    });
+    appendLog(
+      EventType.System_ParticipantConnected,
+      {
+        id: "123",
+        name: "John Doe",
+      },
+      "client"
+    );
 
-    appendLog(EventType.System_ParticipantDisconnected, {
-      id: "123",
-      name: "John Doe",
-    });
+    appendLog(
+      EventType.System_ParticipantDisconnected,
+      {
+        id: "123",
+        name: "John Doed asdasdasd asdaasda sd",
+      },
+      "system"
+    );
 
-    appendLog("system.participant_reconnected", {
-      id: "123",
-    });
+    appendLog(
+      "system.participant_reconnected",
+      {
+        id: "123",
+      },
+      "server"
+    );
   }, [appendLog]);
 
   return (
@@ -105,28 +132,35 @@ export const ConsoleContainer = () => {
               Clear All
             </Button>
           </div>
-          <div className="h-[calc(100%-60px)] overflow-y-auto space-y-2">
+          <div className="h-[calc(100%-52px)] overflow-y-auto border rounded-lg bg-white shadow-sm">
             {filteredLogs.map((logEntry, index) => (
               <div
                 key={index}
-                className="flex flex-col gap-2 p-3 border rounded-lg bg-white shadow-sm"
+                className="flex flex-col gap-2 py-3 px-3 bg-white shadow-sm border-b"
               >
                 <div className="flex items-center">
-                  <span className="text-sm text-muted-foreground mr-16">
+                  <span className="text-sm text-muted-foreground mr-12">
                     {formatDate(logEntry.timestamp)}
                   </span>
+                  <div className="flex items-center w-18 mr-2">
+                    {getSourceIcon(logEntry.source)}
+                    <code className="text-xs font-medium text-muted-foreground">
+                      {logEntry.source}
+                    </code>
+                  </div>
+                  <code className={cn("text-[0.75em] px-1.5 py-[2px] rounded")}>
+                    {getEventMessage(logEntry)}
+                  </code>
+                  <div className="flex-1" />
                   <Badge
                     variant="outline"
                     className={cn(
                       getEventLevelColor(getEventLevel(logEntry)),
-                      "rounded-sm w-12 flex items-center justify-center mr-1.5"
+                      "rounded-sm w-12 flex items-center justify-center"
                     )}
                   >
                     {getEventLevel(logEntry)}
                   </Badge>
-                  <code className={cn("text-[0.75em] px-1.5 py-[2px] rounded")}>
-                    {getEventMessage(logEntry)}
-                  </code>
                 </div>
                 {expandAll && renderEventLog(logEntry)}
               </div>

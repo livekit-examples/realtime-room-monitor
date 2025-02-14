@@ -4,9 +4,11 @@ import { create } from "zustand";
 export type EventRenderer<T extends object> = (data: T) => React.ReactNode;
 
 export type EventLevel = "info" | "warn" | "error";
+export type EventSource = "system" | "client" | "server";
 
 export interface EventDefinition<TData extends object> {
   level: EventLevel;
+  source: EventSource;
   message: string | ((data: TData) => string);
   render: EventRenderer<TData>;
 }
@@ -19,12 +21,13 @@ export function createEventRegistry<T extends Record<string, EventDefinition<any
   interface LogEntry<K extends EventKey> {
     timestamp: Date;
     eventType: K;
+    source: EventSource;
     data: EventData<K>;
   }
 
   interface LoggerState {
     logs: LogEntry<EventKey>[];
-    appendLog: <K extends EventKey>(type: K, data: EventData<K>) => void;
+    appendLog: <K extends EventKey>(type: K, data: EventData<K>, source?: EventSource) => void;
     clear: () => void;
     filter: (query: string) => LogEntry<EventKey>[];
   }
@@ -33,9 +36,9 @@ export function createEventRegistry<T extends Record<string, EventDefinition<any
     // persist(
     (set, get) => ({
       logs: [],
-      appendLog: (type, data) =>
+      appendLog: (type, data, source = "system") =>
         set((state) => ({
-          logs: [{ timestamp: new Date(), eventType: type, data }, ...state.logs],
+          logs: [{ timestamp: new Date(), eventType: type, data, source }, ...state.logs],
         })),
       clear: () => set({ logs: [] }),
       filter: (query) => {
