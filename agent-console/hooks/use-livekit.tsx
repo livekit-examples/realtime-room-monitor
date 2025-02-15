@@ -1,11 +1,11 @@
 import { ConnectionDetails } from "@/app/api/connection-details/route";
-import { useConnectionState, useRoomInfo } from "@livekit/components-react";
+import { useConnectionState, useRoomContext, useRoomInfo } from "@livekit/components-react";
 import { useCallback } from "react";
 import { create } from "zustand";
 
-const useConnectionDetails = create<{
+export const useConnectionDetails = create<{
   connectionDetails: ConnectionDetails | undefined;
-  updateConnectionDetails: (connectionDetails: ConnectionDetails) => void;
+  updateConnectionDetails: (connectionDetails: ConnectionDetails | undefined) => void;
 }>((set) => ({
   connectionDetails: undefined,
   updateConnectionDetails: (connectionDetails) => set({ connectionDetails }),
@@ -27,6 +27,7 @@ export const useLivekitRoomState = () => {
 
 export const useLivekitRoomAction = () => {
   const { updateConnectionDetails } = useConnectionDetails();
+  const room = useRoomContext();
 
   const handleConnect = useCallback(async () => {
     // Generate room connection details, including:
@@ -45,10 +46,14 @@ export const useLivekitRoomAction = () => {
 
     const response = await fetch(url.toString());
     const connectionDetailsData = await response.json();
+    console.log("connectionDetailsData", connectionDetailsData);
     updateConnectionDetails(connectionDetailsData);
   }, [updateConnectionDetails]);
 
-  const handleDisconnect = useCallback(async () => {}, []);
+  const handleDisconnect = useCallback(async () => {
+    if (room) await room.disconnect();
+    updateConnectionDetails(undefined);
+  }, [room, updateConnectionDetails]);
 
   return {
     connect: handleConnect,

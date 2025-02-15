@@ -2,6 +2,7 @@
 
 import LK from "@/components/lk";
 import { ThemeSwitch } from "@/components/theme-switch";
+import { useConnectionDetails } from "@/hooks/use-livekit";
 import {
   AgentState,
   BarVisualizer,
@@ -13,34 +14,12 @@ import {
 import { useKrispNoiseFilter } from "@livekit/components-react/krisp";
 import { AnimatePresence, motion } from "framer-motion";
 import { MediaDeviceFailure } from "livekit-client";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { ConsoleContainer } from "./_components/console-container";
-import type { ConnectionDetails } from "./api/connection-details/route";
 
 export default function Page() {
-  const [connectionDetails, updateConnectionDetails] = useState<ConnectionDetails | undefined>(
-    undefined
-  );
-  const [agentState, setAgentState] = useState<AgentState>("disconnected");
-
-  const onConnectButtonClicked = useCallback(async () => {
-    // Generate room connection details, including:
-    //   - A random Room name
-    //   - A random Participant name
-    //   - An Access Token to permit the participant to join the room
-    //   - The URL of the LiveKit server to connect to
-    //
-    // In real-world application, you would likely allow the user to specify their
-    // own participant name, and possibly to choose from existing rooms to join.
-
-    const url = new URL(
-      process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT ?? "/api/connection-details",
-      window.location.origin
-    );
-    const response = await fetch(url.toString());
-    const connectionDetailsData = await response.json();
-    updateConnectionDetails(connectionDetailsData);
-  }, []);
+  const { connectionDetails, updateConnectionDetails } = useConnectionDetails();
+  console.log("connectionDetails", connectionDetails);
 
   return (
     <main className="h-full w-full bg-accent">

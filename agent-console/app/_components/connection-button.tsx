@@ -12,6 +12,8 @@ import { CircleCheck, SignalHigh } from "lucide-react";
 //   SignalReconnecting = "signalReconnecting",
 // }
 
+const reconnectingStates = ["connecting", "reconnecting", "signalReconnecting"];
+
 export const ConnectionButton: React.FC<React.HTMLAttributes<HTMLButtonElement>> = ({
   className,
   ...props
@@ -59,6 +61,8 @@ export const ConnectionButton: React.FC<React.HTMLAttributes<HTMLButtonElement>>
   };
 
   const handleConnectionButtonClick = () => {
+    if (reconnectingStates.includes(connectionState)) return;
+
     if (connectionState === "connected") {
       disconnect();
     } else {
@@ -67,7 +71,12 @@ export const ConnectionButton: React.FC<React.HTMLAttributes<HTMLButtonElement>>
   };
 
   return (
-    <Button className={cn(className)} onClick={handleConnectionButtonClick} {...props}>
+    <Button
+      className={cn(className)}
+      onClick={handleConnectionButtonClick}
+      disabled={reconnectingStates.includes(connectionState)}
+      {...props}
+    >
       {getButtonContent()}
     </Button>
   );
