@@ -25,7 +25,7 @@ export function ThemePicker() {
 
   return (
     <fieldset className="space-y-4">
-      <legend className="text-sm font-medium leading-none text-foreground">Choose a theme</legend>
+      <legend className="text-sm font-medium leading-none text-foreground">Choose a Theme</legend>
       <RadioGroup className="flex gap-3" defaultValue="1" onValueChange={setTheme}>
         {items.map((item) => (
           <label key={`${id}-${item.value}`}>

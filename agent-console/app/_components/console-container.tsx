@@ -1,4 +1,5 @@
 "use client";
+import { ObservableWrapper } from "@/components/observable-wrapper";
 import { ThemePicker } from "@/components/theme-picker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { LevelFilter } from "./level-filter";
 import { LogItem } from "./log-item";
+import { RoomStateViewer } from "./room-state-viewer";
 
 export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   className,
@@ -126,15 +128,19 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel>
-            <div className="p-6 h-full flex flex-col gap-6">
+            <div className="p-4 h-full flex flex-col gap-4">
               <div className="space-y-2">
-                <h2 className="text-lg font-bold">Appearance Settings</h2>
-                <p className="text-sm text-muted-foreground">Customize the interface appearance</p>
+                <h2 className="text-lg font-bold">LiveKit in Real Time</h2>
+                <p className="text-sm text-muted-foreground">
+                  Maximize the observability of your Livekit room.
+                </p>
               </div>
-
-              <div className="rounded-lg border bg-background p-6 shadow-sm bg-muted/30">
+              <ObservableWrapper>
                 <ThemePicker />
-              </div>
+              </ObservableWrapper>
+              <ObservableWrapper>
+                <RoomStateViewer />
+              </ObservableWrapper>
             </div>
           </ResizablePanel>
         </ResizablePanelGroup>
