@@ -1,3 +1,4 @@
+import { JsonPreview } from "@/components/json-preview";
 import React from "react";
 import { create } from "zustand";
 import { EventLevel, EventSource } from "./event-types";
@@ -8,13 +9,6 @@ export interface EventDefinition<TData extends object> {
   source: EventSource;
   message: string | ((data: TData) => string);
   render: EventRenderer<TData>;
-}
-
-export interface LogEntry {
-  timestamp: Date;
-  eventType: string;
-  source: EventSource;
-  data: object;
 }
 
 export function defineEvent<TData extends object>(definition: EventDefinition<TData>) {
@@ -104,7 +98,5 @@ export function createEventRegistry<T extends Record<string, EventDefinition<any
 }
 
 export const renderJson = <T extends object>(data: T) => (
-  <pre className="text-xs bg-zinc-50 p-2 rounded-md overflow-x-auto dark:bg-zinc-900">
-    {JSON.stringify(data, null, 2)}
-  </pre>
+  <JsonPreview collapsed={2} displayDataTypes={false} data={data} />
 );

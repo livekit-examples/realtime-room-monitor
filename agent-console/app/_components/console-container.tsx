@@ -6,6 +6,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/componen
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { WideSwitch } from "@/components/wide-switch";
+import { useLivekitState } from "@/hooks/use-livekit";
 import { getEventLevel, getEventMessage, useLogger } from "@/hooks/use-logger";
 import { EventType } from "@/lib/event-types";
 import { cn } from "@/lib/utils";
@@ -19,6 +20,7 @@ import { LivekitStateTabs } from "./livekit-state-tabs";
 import { LogItem } from "./log-item";
 import { ParticipantViewer } from "./participant-viewer";
 import { RoomStateViewer } from "./room-state-viewer";
+
 export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   className,
   ...rest
@@ -57,6 +59,9 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
         (displayError && getEventLevel(log) === "error"));
     return shouldDisplay;
   });
+
+  const { room } = useLivekitState();
+  const { localParticipant } = useLivekitState();
 
   useEffect(() => {
     appendLog(EventType.System_ParticipantConnected, {
@@ -124,6 +129,7 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
           <ResizableHandle withHandle />
           <ResizablePanel>
             <div className="h-full flex flex-col">
+              {/* Header */}
               <div className="flex flex-col border-b p-4">
                 <div className="flex justify-between items-center">
                   <div className="space-y-2 pr-3">
@@ -153,6 +159,7 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
                     </Button>
                   </div>
                 </div>
+                {/* Control Bar */}
                 <motion.div
                   animate={{ height: controlBarExpanded ? "auto" : 0 }}
                   initial={false}
@@ -196,11 +203,19 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
                 <div className="absolute inset-0">
                   <ScrollArea className="h-full px-4">
                     <div className="flex flex-col py-4 gap-4">
-                      <ObservableWrapper>
-                        <RoomStateViewer />
+                      <ObservableWrapper
+                        state={room}
+                        title="Room State"
+                        subtitle={room.name || "Not connected"}
+                      >
+                        {(state) => <RoomStateViewer state={state} />}
                       </ObservableWrapper>
-                      <ObservableWrapper>
-                        <ParticipantViewer />
+                      <ObservableWrapper
+                        state={localParticipant}
+                        title="Participant State"
+                        subtitle={localParticipant.identity}
+                      >
+                        {(state) => <ParticipantViewer state={state} />}
                       </ObservableWrapper>
                     </div>
                   </ScrollArea>

@@ -154,3 +154,11 @@ export const useLivekitState = () => {
     localParticipant: localParticipantState,
   };
 };
+
+export type LivekitRoomState = ReturnType<typeof useLivekitRoomState>;
+export type LivekitParticipantState = ReturnType<typeof useLivekitParticipantState>;
+
+export type LivekitState = {
+  room: LivekitRoomState;
+  localParticipant: LivekitParticipantState;
+};

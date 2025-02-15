@@ -1,7 +1,7 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
-import { getEventLevel, getEventMessage, renderEventLog } from "@/hooks/use-logger";
-import { EventLevel, EventSource, LogEntry } from "@/lib/event-registry";
+import { getEventLevel, getEventMessage, LogEntry, renderEventLog } from "@/hooks/use-logger";
+import { EventLevel, EventSource } from "@/lib/event-types";
 import { cn, formatDate } from "@/lib/utils";
 import { ArrowDownCircle, ArrowUpCircle, Server, Settings } from "lucide-react";
 

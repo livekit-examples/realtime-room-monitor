@@ -1,5 +1,8 @@
 import { EventRegistry, eventRegistry } from "@/lib/event-definitions";
 import { createEventRegistry } from "@/lib/event-registry";
 
-export const { useLogger, renderEventLog, getEventLevel, getEventMessage } =
-  createEventRegistry<EventRegistry>(eventRegistry);
+const registry = createEventRegistry<EventRegistry>(eventRegistry);
+
+export const { useLogger, renderEventLog, getEventLevel, getEventMessage } = registry;
+
+export type LogEntry = ReturnType<typeof useLogger.getState>["logs"][number];
