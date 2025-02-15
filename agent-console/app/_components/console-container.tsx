@@ -11,6 +11,7 @@ import { getEventLevel, getEventMessage, useLogger } from "@/hooks/use-logger";
 import { EventType } from "@/lib/event-types";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import { ConnectionButton } from "./connection-button";
 import { LevelFilter } from "./level-filter";
 import { LogItem } from "./log-item";
 import { RoomStateViewer } from "./room-state-viewer";
@@ -129,11 +130,15 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
           <ResizableHandle withHandle />
           <ResizablePanel>
             <div className="p-4 h-full flex flex-col gap-4">
-              <div className="space-y-2">
-                <h2 className="text-lg font-bold">LiveKit in Real Time</h2>
-                <p className="text-sm text-muted-foreground">
-                  Maximize the observability of your Livekit room.
-                </p>
+              <div className="flex justify-between items-center">
+                <div className="space-y-2">
+                  <h2 className="text-lg font-bold">LiveKit in Real Time</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Maximize the observability of your Livekit room.
+                  </p>
+                </div>
+                {/* Connection Button */}
+                <ConnectionButton />
               </div>
               <ObservableWrapper>
                 <ThemePicker />
