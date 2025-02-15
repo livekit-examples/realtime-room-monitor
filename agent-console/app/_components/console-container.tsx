@@ -131,7 +131,7 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
           <ResizablePanel>
             <div className="p-4 h-full flex flex-col gap-4">
               <div className="flex justify-between items-center">
-                <div className="space-y-2">
+                <div className="space-y-2 pr-3">
                   <h2 className="text-lg font-bold">LiveKit in Real Time</h2>
                   <p className="text-sm text-muted-foreground">
                     Maximize the observability of your Livekit room.
