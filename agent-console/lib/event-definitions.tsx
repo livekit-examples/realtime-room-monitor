@@ -13,15 +13,15 @@ export interface RoomConnectionData {
 export const participantConnectedEvent = defineEvent<ParticipantConnectionData>({
   level: EventLevel.Info,
   source: EventSource.System,
-  message: (data) => `Participant ${data.name} connected`,
-  render: (data) => renderJson(data),
+  message: ({ name }) => `Participant ${name} connected`,
+  render: ({ name }) => renderJson({ name }),
 });
 
 export const participantDisconnectedEvent = defineEvent<ParticipantConnectionData>({
   level: EventLevel.Error,
   source: EventSource.System,
-  message: (data) => `Participant ${data.name} disconnected`,
-  render: (data) => renderJson(data),
+  message: ({ name }) => `Participant ${name} disconnected`,
+  render: ({ name }) => renderJson({ name }),
 });
 
 export const roomReconnectedEvent = defineEvent<RoomConnectionData>({

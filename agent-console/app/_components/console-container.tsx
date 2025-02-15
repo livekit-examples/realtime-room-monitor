@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { ConnectionButton } from "./connection-button";
 import { LevelFilter } from "./level-filter";
 import { LogItem } from "./log-item";
+import { ParticipantViewer } from "./participant-viewer";
 import { RoomStateViewer } from "./room-state-viewer";
 
 export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
@@ -72,7 +73,7 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
     <div className={cn("w-full flex flex-row", className)} {...rest}>
       {typeof window === "undefined" ? null : (
         <ResizablePanelGroup direction="horizontal">
-          <ResizablePanel className="py-4 min-w-[565px] max-w-[876px] flex flex-col">
+          <ResizablePanel className="py-4 min-w-[450px] max-w-[876px] flex flex-col">
             {/* Actions */}
             <div className="mb-4 px-4 flex items-center justify-between gap-2">
               <LevelFilter
@@ -133,6 +134,9 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
               </ObservableWrapper>
               <ObservableWrapper>
                 <RoomStateViewer />
+              </ObservableWrapper>
+              <ObservableWrapper>
+                <ParticipantViewer />
               </ObservableWrapper>
             </div>
           </ResizablePanel>
