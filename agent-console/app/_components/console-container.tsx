@@ -157,7 +157,7 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
                   animate={{ height: controlBarExpanded ? "auto" : 0 }}
                   initial={false}
                   transition={{ duration: 0.3 }}
-                  className="overflow-hidden pt-4"
+                  className="overflow-hidden"
                 >
                   <AnimatePresence mode="wait">
                     {connectionState !== "disconnected" ? (
@@ -168,7 +168,7 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
                         exit={{ opacity: 0 }}
                       >
                         <LivekitControlBar
-                          className="border bg-muted rounded-md"
+                          className="border bg-muted rounded-md mt-4"
                           controls={{ leave: false }}
                         />
                       </motion.div>
@@ -178,7 +178,7 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="flex items-center justify-center border bg-muted rounded-md p-4"
+                        className="flex items-center justify-center border bg-muted rounded-md p-4 mt-4 min-h-[68px]"
                       >
                         <p className="text-sm text-muted-foreground">
                           No connection to LiveKit server
@@ -188,7 +188,6 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
                   </AnimatePresence>
                 </motion.div>
               </div>
-
               {/* <ControlBar className="m-4" /> */}
               {/* <ThemePicker /> */}
               {/* <VoiceAssistantControlBar controls={{ leave: false }} /> */}
