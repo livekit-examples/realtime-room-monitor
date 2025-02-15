@@ -68,15 +68,13 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
       "system"
     );
 
-    for (let i = 0; i < 100; i++) {
-      appendLog(
-        "system.participant_reconnected",
-        {
-          id: "123",
-        },
-        "server"
-      );
-    }
+    appendLog(
+      "system.participant_reconnected",
+      {
+        id: "123",
+      },
+      "server"
+    );
   }, [appendLog]);
 
   return (
