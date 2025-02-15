@@ -1,11 +1,13 @@
+import { CollapsibleSection } from "@/components/collapsible-section";
+import { JsonPreview } from "@/components/json-preview";
+import { MetricBadge } from "@/components/metric-badge";
+import { MediaStatusBadge } from "@/components/metric-status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useLivekitState } from "@/hooks/use-livekit";
 import { cn, formatDate } from "@/lib/utils";
 import {
   AlertCircle,
-  ChevronDown,
   Mic,
   MicOff,
   ScreenShare,
@@ -106,7 +108,12 @@ export const ParticipantViewer = () => {
               unit="%"
             />
             <MetricBadge label="Is Speaking" value={localParticipant.isSpeaking ? "Yes" : "No"} />
-            <MetricBadge label="Last Spoke" value={formatDate(localParticipant.lastSpokeAt)} />
+            <MetricBadge
+              label="Last Spoke"
+              value={
+                localParticipant.lastSpokeAt ? formatDate(localParticipant.lastSpokeAt) : "N/A"
+              }
+            />
             <MetricBadge
               label="Permissions"
               value={localParticipant.permissions?.canPublish ? "Publisher" : "Listener"}
@@ -140,52 +147,12 @@ export const ParticipantViewer = () => {
   );
 };
 
-// Helper Components
-const MediaStatusBadge = ({
-  enabled,
-  enabledIcon,
-  disabledIcon,
-  label,
-  enabledText,
-  disabledText,
-}: {
-  enabled: boolean;
-  enabledIcon: React.ReactNode;
-  disabledIcon: React.ReactNode;
-  label: string;
-  enabledText: string;
-  disabledText: string;
-}) => (
-  <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-md">
-    <div className={cn("p-1 rounded-full", enabled ? "text-green-600" : "text-red-600")}>
-      {enabled ? enabledIcon : disabledIcon}
-    </div>
-    <span className="text-sm">{label}</span>
-    <Badge
-      variant="outline"
-      className={cn("ml-auto", enabled ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800")}
-    >
-      {enabled ? enabledText : disabledText}
-    </Badge>
-  </div>
-);
-
-const CollapsibleSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
-  <Collapsible defaultOpen>
-    <CollapsibleTrigger className="w-full flex items-center justify-between p-2 bg-muted/50 rounded-md">
-      <span className="text-sm font-medium">{title}</span>
-      <ChevronDown className="h-4 w-4 transition-transform [&[data-state=open]]:rotate-180" />
-    </CollapsibleTrigger>
-    <CollapsibleContent className="pt-2">{children}</CollapsibleContent>
-  </Collapsible>
-);
-
 const TrackDetail = ({
   title,
   tracks,
 }: {
   title: string;
-  tracks: Map<string, any> | undefined;
+  tracks: Map<string, unknown> | undefined;
 }) => (
   <div className="space-y-2">
     <h4 className="text-sm font-medium">{title}</h4>
@@ -213,36 +180,5 @@ const TrackDetail = ({
     ) : (
       <div className="text-sm text-muted-foreground italic">No {title.toLowerCase()}</div>
     )}
-  </div>
-);
-
-const JsonPreview = ({ title, data }: { title: string; data: any }) => (
-  <div className="space-y-2">
-    <h4 className="text-sm font-medium">{title}</h4>
-    {data ? (
-      <pre className="text-xs bg-muted/50 p-2 rounded-md overflow-x-auto">
-        {JSON.stringify(data, null, 2)}
-      </pre>
-    ) : (
-      <div className="text-sm text-muted-foreground italic">No {title.toLowerCase()}</div>
-    )}
-  </div>
-);
-
-const MetricBadge = ({
-  label,
-  value,
-  unit,
-}: {
-  label: string;
-  value: string | number | undefined;
-  unit?: string;
-}) => (
-  <div className="flex flex-col gap-1 p-2 bg-muted/50 rounded-md">
-    <span className="text-xs text-muted-foreground">{label}</span>
-    <div className="flex items-baseline gap-1">
-      <span className="text-sm font-medium">{value ?? "N/A"}</span>
-      {unit && <span className="text-xs text-muted-foreground">{unit}</span>}
-    </div>
   </div>
 );

@@ -8,7 +8,6 @@ import {
   BarVisualizer,
   DisconnectButton,
   LiveKitRoom,
-  RoomAudioRenderer,
   useVoiceAssistant,
   VoiceAssistantControlBar,
 } from "@livekit/components-react";
@@ -47,7 +46,6 @@ export default function Page() {
         <div className="flex-1 p-2">
           <ConsoleContainer className="h-full shadow-sm rounded-md bg-background" />
         </div>
-        <RoomAudioRenderer />
       </LiveKitRoom>
     </main>
   );
