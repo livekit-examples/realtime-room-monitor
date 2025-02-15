@@ -129,15 +129,23 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
                 {/* Connection Button */}
                 <ConnectionButton />
               </div>
-              <ObservableWrapper>
-                <ThemePicker />
-              </ObservableWrapper>
-              <ObservableWrapper>
-                <RoomStateViewer />
-              </ObservableWrapper>
-              <ObservableWrapper>
-                <ParticipantViewer />
-              </ObservableWrapper>
+              <div className="flex-1 relative">
+                <div className="absolute inset-0">
+                  <ScrollArea className="h-full">
+                    <div className="flex flex-col gap-4">
+                      <ObservableWrapper>
+                        <ThemePicker />
+                      </ObservableWrapper>
+                      <ObservableWrapper>
+                        <RoomStateViewer />
+                      </ObservableWrapper>
+                      <ObservableWrapper>
+                        <ParticipantViewer />
+                      </ObservableWrapper>
+                    </div>
+                  </ScrollArea>
+                </div>
+              </div>
             </div>
           </ResizablePanel>
         </ResizablePanelGroup>
