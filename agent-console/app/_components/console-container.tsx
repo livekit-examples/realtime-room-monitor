@@ -118,8 +118,8 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel>
-            <div className="p-4 h-full flex flex-col gap-4">
-              <div className="flex justify-between items-center">
+            <div className="h-full flex flex-col">
+              <div className="flex justify-between items-center p-4 border-b">
                 <div className="space-y-2 pr-3">
                   <h2 className="text-lg font-bold">LiveKit in Real Time</h2>
                   <p className="text-sm text-muted-foreground">
@@ -131,8 +131,8 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
               </div>
               <div className="flex-1 relative">
                 <div className="absolute inset-0">
-                  <ScrollArea className="h-full">
-                    <div className="flex flex-col gap-4">
+                  <ScrollArea className="h-full px-4">
+                    <div className="flex flex-col py-4 gap-4">
                       <ObservableWrapper>
                         <ThemePicker />
                       </ObservableWrapper>
