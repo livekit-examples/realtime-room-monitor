@@ -19,7 +19,6 @@ import { ConsoleContainer } from "./_components/console-container";
 
 export default function Page() {
   const { connectionDetails, updateConnectionDetails } = useConnectionDetails();
-  console.log("connectionDetails", connectionDetails);
 
   return (
     <main className="h-full w-full bg-accent">

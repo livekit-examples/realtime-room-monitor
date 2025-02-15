@@ -8,3 +8,15 @@ export enum EventType {
   System_RoomDisconnected = "system:room_disconnected",
   System_TranscriptionReceived = "system:transcription_received",
 }
+
+export enum EventLevel {
+  Info = "info",
+  Warn = "warn",
+  Error = "error",
+}
+
+export enum EventSource {
+  System = "system",
+  Client = "client",
+  Server = "server",
+}

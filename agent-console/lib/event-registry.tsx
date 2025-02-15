@@ -1,10 +1,7 @@
 import React from "react";
 import { create } from "zustand";
-
+import { EventLevel, EventSource } from "./event-types";
 export type EventRenderer<T extends object> = (data: T) => React.ReactNode;
-
-export type EventLevel = "info" | "warn" | "error";
-export type EventSource = "system" | "client" | "server";
 
 export interface EventDefinition<TData extends object> {
   level: EventLevel;
@@ -18,6 +15,10 @@ export interface LogEntry {
   eventType: string;
   source: EventSource;
   data: object;
+}
+
+export function defineEvent<TData extends object>(definition: EventDefinition<TData>) {
+  return definition;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -34,18 +35,26 @@ export function createEventRegistry<T extends Record<string, EventDefinition<any
 
   interface LoggerState {
     logs: LogEntry<EventKey>[];
-    appendLog: <K extends EventKey>(type: K, data: EventData<K>, source?: EventSource) => void;
+    appendLog: <K extends EventKey>(type: K, data: EventData<K>) => void;
     clear: () => void;
     filter: (query: string) => LogEntry<EventKey>[];
   }
+
+  const getEventSourceByType = (type: EventKey) => {
+    const eventDefinition = config[type];
+    return eventDefinition.source;
+  };
 
   const useStore = create<LoggerState>()(
     // persist(
     (set, get) => ({
       logs: [],
-      appendLog: (type, data, source = "system") =>
+      appendLog: (type, data) =>
         set((state) => ({
-          logs: [{ timestamp: new Date(), eventType: type, data, source }, ...state.logs],
+          logs: [
+            { timestamp: new Date(), eventType: type, data, source: getEventSourceByType(type) },
+            ...state.logs,
+          ],
         })),
       clear: () => set({ logs: [] }),
       filter: (query) => {
@@ -93,3 +102,9 @@ export function createEventRegistry<T extends Record<string, EventDefinition<any
     getEventMessage,
   };
 }
+
+export const renderJson = <T extends object>(data: T) => (
+  <pre className="text-xs bg-zinc-50 p-2 rounded-md overflow-x-auto dark:bg-zinc-900">
+    {JSON.stringify(data, null, 2)}
+  </pre>
+);

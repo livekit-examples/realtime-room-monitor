@@ -53,31 +53,19 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
   });
 
   useEffect(() => {
-    appendLog(
-      EventType.System_ParticipantConnected,
-      {
-        id: "123",
-        name: "John Doe",
-      },
-      "client"
-    );
+    appendLog(EventType.System_ParticipantConnected, {
+      id: "123",
+      name: "John Doe",
+    });
 
-    appendLog(
-      EventType.System_ParticipantDisconnected,
-      {
-        id: "123",
-        name: "John Doed asdasdasd asdaasda sd",
-      },
-      "system"
-    );
+    appendLog(EventType.System_ParticipantDisconnected, {
+      id: "123",
+      name: "John Doed asdasdasd asdaasda sd",
+    });
 
-    appendLog(
-      "system.participant_reconnected",
-      {
-        id: "123",
-      },
-      "server"
-    );
+    appendLog(EventType.System_RoomDisconnected, {
+      name: "Room 1",
+    });
   }, [appendLog]);
 
   return (

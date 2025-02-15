@@ -2,17 +2,14 @@
 import { Button } from "@/components/ui/button";
 import { useLivekitAction, useLivekitState } from "@/hooks/use-livekit";
 import { cn } from "@/lib/utils";
+import { ConnectionState } from "livekit-client";
 import { CircleCheck, SignalHigh } from "lucide-react";
 
-// export enum ConnectionState {
-//   Disconnected = "disconnected",
-//   Connecting = "connecting",
-//   Connected = "connected",
-//   Reconnecting = "reconnecting",
-//   SignalReconnecting = "signalReconnecting",
-// }
-
-const reconnectingStates = ["connecting", "reconnecting", "signalReconnecting"];
+const reconnectingStates = [
+  ConnectionState.Connecting,
+  ConnectionState.Reconnecting,
+  ConnectionState.SignalReconnecting,
+];
 
 export const ConnectionButton: React.FC<React.HTMLAttributes<HTMLButtonElement>> = ({
   className,

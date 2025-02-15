@@ -1,29 +1,6 @@
-import { ConnectionDetails } from "@/app/api/connection-details/route";
-import { useConnectionState, useRoomContext, useRoomInfo } from "@livekit/components-react";
+import { useRoomContext } from "@livekit/components-react";
 import { useCallback } from "react";
-import { create } from "zustand";
-
-export const useConnectionDetails = create<{
-  connectionDetails: ConnectionDetails | undefined;
-  updateConnectionDetails: (connectionDetails: ConnectionDetails | undefined) => void;
-}>((set) => ({
-  connectionDetails: undefined,
-  updateConnectionDetails: (connectionDetails) => set({ connectionDetails }),
-}));
-
-export const useLivekitRoomState = () => {
-  const { connectionDetails } = useConnectionDetails();
-
-  const { name, metadata } = useRoomInfo();
-  const connectionState = useConnectionState();
-
-  return {
-    connectionDetails,
-    connectionState,
-    name,
-    metadata,
-  };
-};
+import { useConnectionDetails } from "./use-conn-details";
 
 export const useLivekitRoomAction = () => {
   const { updateConnectionDetails } = useConnectionDetails();
@@ -58,14 +35,6 @@ export const useLivekitRoomAction = () => {
   return {
     connect: handleConnect,
     disconnect: handleDisconnect,
-  };
-};
-
-export const useLivekitState = () => {
-  const room = useLivekitRoomState();
-
-  return {
-    room,
   };
 };
 
