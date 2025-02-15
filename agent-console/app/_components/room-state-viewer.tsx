@@ -96,9 +96,9 @@ export const RoomStateViewer = () => {
   );
 };
 
-const safeParseJSON = (data?: string): unknown => {
+const safeParseJSON = (data?: string): object | undefined => {
   try {
-    return data ? JSON.parse(data) : null;
+    return data ? JSON.parse(data) : undefined;
   } catch (error) {
     return { error: `Invalid JSON format ${error}`, rawData: data };
   }
