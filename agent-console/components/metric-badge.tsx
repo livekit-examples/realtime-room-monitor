@@ -1,11 +1,17 @@
-export const MetricBadge = ({
-  label,
-  value,
-  unit,
-}: {
+import { cn } from "@/lib/utils";
+
+export interface MetricBadgeProps extends React.HTMLAttributes<HTMLDivElement> {
   label: string;
   value: string | number | undefined;
   unit?: string;
+}
+
+export const MetricBadge: React.FC<MetricBadgeProps> = ({
+  label,
+  value,
+  unit,
+  className,
+  ...props
 }) => {
   const displayValue = () => {
     if (value === undefined || value === null) return "N/A";
@@ -14,7 +20,7 @@ export const MetricBadge = ({
   };
 
   return (
-    <div className="flex flex-col gap-1 p-2 bg-muted/50 rounded-md">
+    <div className={cn("flex flex-col gap-1 p-2 bg-muted/50 rounded-md", className)} {...props}>
       <span className="text-xs text-muted-foreground">{label}</span>
       <div className="flex items-baseline gap-1">
         <span className="text-sm font-medium truncate">{displayValue()}</span>

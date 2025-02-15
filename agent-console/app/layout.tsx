@@ -1,6 +1,8 @@
+import "@livekit/components-styles";
 import { ThemeProvider } from "next-themes";
 import { Public_Sans } from "next/font/google";
 import "./globals.css";
+
 const publicSans400 = Public_Sans({
   weight: "400",
   subsets: ["latin"],

@@ -1,11 +1,11 @@
 import { CollapsibleSection } from "@/components/collapsible-section";
 import { JsonPreview } from "@/components/json-preview";
 import { MetricBadge } from "@/components/metric-badge";
-import { MediaStatusBadge } from "@/components/metric-status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLivekitState } from "@/hooks/use-livekit";
-import { cn, formatDate } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { ConnectionQuality, TrackPublication } from "livekit-client";
 import {
   AlertCircle,
   Mic,
@@ -16,128 +16,130 @@ import {
   VideoOff,
 } from "lucide-react";
 
+const getConnectionQualityColor = (quality: ConnectionQuality) => {
+  switch (quality) {
+    case ConnectionQuality.Excellent:
+      return "bg-green-500/15 text-green-700";
+    case ConnectionQuality.Good:
+      return "bg-yellow-500/15 text-yellow-700";
+    case ConnectionQuality.Poor:
+      return "bg-orange-500/15 text-orange-700";
+    case ConnectionQuality.Lost:
+      return "bg-red-500/15 text-red-700";
+    default:
+      return "bg-gray-500/15 text-gray-700";
+  }
+};
+
 export const ParticipantViewer = () => {
   const { localParticipant } = useLivekitState();
+  const {
+    identity,
+    metadata,
+    attributes,
+    connectionQuality,
+    isSpeaking,
+    audioLevel,
+    permissions,
+    tracks,
+    errors,
+  } = localParticipant;
 
   return (
     <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
-            <span className="text-lg">Participant Details</span>
+            <span className="text-lg">Participant State</span>
             <Badge variant="secondary" className="px-2 py-1">
-              {localParticipant.identity}
+              {identity}
             </Badge>
           </div>
           <div className="flex gap-4 text-sm text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <span>Joined:</span>
-              <span className="font-mono">
-                {formatDate(localParticipant.joinedAt ?? new Date())}
-              </span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span>Connection Quality:</span>
-              <Badge
-                variant="outline"
-                className={cn(
-                  "px-1.5 py-0.5 text-xs",
-                  localParticipant.connectionQuality === "excellent"
-                    ? "bg-green-500/15 text-green-700"
-                    : localParticipant.connectionQuality === "good"
-                    ? "bg-yellow-500/15 text-yellow-700"
-                    : "bg-red-500/15 text-red-700"
-                )}
-              >
-                {localParticipant.connectionQuality}
-              </Badge>
-            </div>
+            <MetricBadge
+              label="Connection Quality"
+              value={connectionQuality}
+              className={getConnectionQualityColor(connectionQuality)}
+            />
+            <MetricBadge label="Audio Level" value={Math.round(audioLevel * 100)} unit="%" />
+            <MetricBadge label="Speaking" value={isSpeaking ? "Yes" : "No"} />
           </div>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Media Status Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <MediaStatusBadge
-            enabled={localParticipant.isMicrophoneEnabled}
-            enabledIcon={<Mic className="h-4 w-4" />}
-            disabledIcon={<MicOff className="h-4 w-4" />}
-            label="Microphone"
-            enabledText="Active"
-            disabledText="Muted"
-          />
-          <MediaStatusBadge
-            enabled={localParticipant.isCameraEnabled}
-            enabledIcon={<Video className="h-4 w-4" />}
-            disabledIcon={<VideoOff className="h-4 w-4" />}
-            label="Camera"
-            enabledText="Active"
-            disabledText="Off"
-          />
-          <MediaStatusBadge
-            enabled={localParticipant.isScreenShareEnabled}
-            enabledIcon={<ScreenShare className="h-4 w-4" />}
-            disabledIcon={<ScreenShareOff className="h-4 w-4" />}
-            label="Screen Share"
-            enabledText="Sharing"
-            disabledText="Inactive"
-          />
-        </div>
-
-        {/* Technical Details */}
-        <CollapsibleSection title="Track Publications">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <TrackDetail title="Audio Tracks" tracks={localParticipant.audioTrackPublications} />
-            <TrackDetail title="Video Tracks" tracks={localParticipant.videoTrackPublications} />
+        {/* Media Status */}
+        <CollapsibleSection title="Media Status">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <MediaStatusBadge
+              enabled={localParticipant.isMicrophoneEnabled}
+              muted={localParticipant.muted.microphone}
+              label="Microphone"
+              enabledIcon={<Mic className="h-4 w-4" />}
+              disabledIcon={<MicOff className="h-4 w-4" />}
+            />
+            <MediaStatusBadge
+              enabled={localParticipant.isCameraEnabled}
+              muted={localParticipant.muted.camera}
+              label="Camera"
+              enabledIcon={<Video className="h-4 w-4" />}
+              disabledIcon={<VideoOff className="h-4 w-4" />}
+            />
+            <MediaStatusBadge
+              enabled={localParticipant.isScreenShareEnabled}
+              muted={localParticipant.muted.screenShare}
+              label="Screen Share"
+              enabledIcon={<ScreenShare className="h-4 w-4" />}
+              disabledIcon={<ScreenShareOff className="h-4 w-4" />}
+            />
           </div>
         </CollapsibleSection>
 
+        {/* Track Publications */}
+        <CollapsibleSection title="Track Publications">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <TrackPublicationGroup title="Microphone Tracks" tracks={tracks.microphoneTracks} />
+            <TrackPublicationGroup title="Camera Tracks" tracks={tracks.cameraTracks} />
+            <TrackPublicationGroup title="Screen Share Tracks" tracks={tracks.screenShareTracks} />
+          </div>
+        </CollapsibleSection>
+
+        {/* Metadata */}
         <CollapsibleSection title="Participant Metadata">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <JsonPreview title="Attributes" data={localParticipant.attributes} />
-            <JsonPreview title="Metadata" data={localParticipant.metadata} />
+            <JsonPreview title="Attributes" data={attributes} />
+            <JsonPreview title="Metadata" data={metadata} />
           </div>
         </CollapsibleSection>
 
-        {/* Connection Details */}
-        <CollapsibleSection title="Connection Metrics">
+        {/* Permissions */}
+        <CollapsibleSection title="Permissions">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <MetricBadge label="Can Publish" value={permissions?.canPublish ? "Yes" : "No"} />
+            <MetricBadge label="Can Subscribe" value={permissions?.canSubscribe ? "Yes" : "No"} />
             <MetricBadge
-              label="Audio Level"
-              value={Math.round(localParticipant.audioLevel * 100)}
-              unit="%"
+              label="Can Publish Data"
+              value={permissions?.canPublishData ? "Yes" : "No"}
             />
-            <MetricBadge label="Is Speaking" value={localParticipant.isSpeaking ? "Yes" : "No"} />
-            <MetricBadge
-              label="Last Spoke"
-              value={
-                localParticipant.lastSpokeAt ? formatDate(localParticipant.lastSpokeAt) : "N/A"
-              }
-            />
-            <MetricBadge
-              label="Permissions"
-              value={localParticipant.permissions?.canPublish ? "Publisher" : "Listener"}
-            />
+            <MetricBadge label="Hidden" value={permissions?.hidden ? "Yes" : "No"} />
           </div>
         </CollapsibleSection>
 
-        {/* Error States */}
-        {(localParticipant.lastMicrophoneError || localParticipant.lastCameraError) && (
+        {/* Errors */}
+        {(errors.lastMicrophoneError || errors.lastCameraError) && (
           <div className="bg-red-100/20 p-4 rounded-md space-y-2">
             <div className="flex items-center gap-2 text-red-600">
               <AlertCircle className="h-4 w-4" />
               <h4 className="text-sm font-medium">Device Errors</h4>
             </div>
-            {localParticipant.lastMicrophoneError && (
+            {errors.lastMicrophoneError && (
               <div className="text-sm">
                 <span className="font-medium">Microphone:</span>{" "}
-                {localParticipant.lastMicrophoneError.message}
+                {errors.lastMicrophoneError.message}
               </div>
             )}
-            {localParticipant.lastCameraError && (
+            {errors.lastCameraError && (
               <div className="text-sm">
-                <span className="font-medium">Camera:</span>{" "}
-                {localParticipant.lastCameraError.message}
+                <span className="font-medium">Camera:</span> {errors.lastCameraError.message}
               </div>
             )}
           </div>
@@ -147,29 +149,58 @@ export const ParticipantViewer = () => {
   );
 };
 
-const TrackDetail = ({
+const MediaStatusBadge = ({
+  enabled,
+  muted,
+  label,
+  enabledIcon,
+  disabledIcon,
+}: {
+  enabled: boolean;
+  muted: boolean;
+  label: string;
+  enabledIcon: React.ReactNode;
+  disabledIcon: React.ReactNode;
+}) => (
+  <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-md">
+    <div className={cn("p-1 rounded-full", enabled && !muted ? "text-green-600" : "text-red-600")}>
+      {enabled ? enabledIcon : disabledIcon}
+    </div>
+    <span className="text-sm">{label}</span>
+    <Badge
+      variant="outline"
+      className={cn("ml-auto", muted ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800")}
+    >
+      {muted ? "Muted" : "Active"}
+    </Badge>
+  </div>
+);
+
+const TrackPublicationGroup = ({
   title,
   tracks,
 }: {
   title: string;
-  tracks: Map<string, unknown> | undefined;
+  tracks: TrackPublication[];
 }) => (
   <div className="space-y-2">
     <h4 className="text-sm font-medium">{title}</h4>
-    {tracks && Array.from(tracks.values()).length > 0 ? (
+    {tracks.length > 0 ? (
       <div className="space-y-1">
-        {Array.from(tracks.values()).map((pub: any) => (
+        {tracks.map((pub) => (
           <div key={pub.trackSid} className="p-2 text-xs bg-muted/30 rounded-md font-mono">
-            {pub.trackName || pub.trackSid}
-            <div className="flex gap-2 mt-1">
-              <Badge variant="outline" className="px-1.5 py-0.5">
-                {pub.kind}
+            <div className="flex justify-between items-center">
+              <span>{pub.trackName || pub.trackSid}</span>
+              <Badge variant="outline" className="px-1.5 py-0.5 text-xs">
+                {pub.track?.kind}
               </Badge>
-              <Badge variant="outline" className="px-1.5 py-0.5">
+            </div>
+            <div className="mt-1 flex gap-2">
+              <Badge variant="outline" className="px-1.5 py-0.5 text-xs">
                 {pub.isMuted ? "Muted" : "Active"}
               </Badge>
               {pub.isEncrypted && (
-                <Badge variant="outline" className="px-1.5 py-0.5">
+                <Badge variant="outline" className="px-1.5 py-0.5 text-xs">
                   Encrypted
                 </Badge>
               )}
@@ -182,3 +213,11 @@ const TrackDetail = ({
     )}
   </div>
 );
+
+const safeParseJSON = (data?: string) => {
+  try {
+    return data ? JSON.parse(data) : null;
+  } catch (error) {
+    return { error: "Invalid JSON format", rawData: data };
+  }
+};

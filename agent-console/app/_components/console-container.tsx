@@ -1,6 +1,5 @@
 "use client";
 import { ObservableWrapper } from "@/components/observable-wrapper";
-import { ThemePicker } from "@/components/theme-picker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
@@ -10,13 +9,17 @@ import { WideSwitch } from "@/components/wide-switch";
 import { getEventLevel, getEventMessage, useLogger } from "@/hooks/use-logger";
 import { EventType } from "@/lib/event-types";
 import { cn } from "@/lib/utils";
+import {
+  ControlBar as LivekitControlBar,
+  VoiceAssistantControlBar,
+} from "@livekit/components-react";
 import { useEffect, useState } from "react";
 import { ConnectionButton } from "./connection-button";
+import { ControlBar } from "./control-bar";
 import { LevelFilter } from "./level-filter";
 import { LogItem } from "./log-item";
 import { ParticipantViewer } from "./participant-viewer";
 import { RoomStateViewer } from "./room-state-viewer";
-
 export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   className,
   ...rest
@@ -129,12 +132,15 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
                 {/* Connection Button */}
                 <ConnectionButton />
               </div>
+              <ControlBar className="m-4" />
               <div className="flex-1 relative">
                 <div className="absolute inset-0">
                   <ScrollArea className="h-full px-4">
                     <div className="flex flex-col py-4 gap-4">
                       <ObservableWrapper>
-                        <ThemePicker />
+                        {/* <ThemePicker /> */}
+                        <LivekitControlBar controls={{ leave: false }} />
+                        <VoiceAssistantControlBar controls={{ leave: false }} />
                       </ObservableWrapper>
                       <ObservableWrapper>
                         <RoomStateViewer />
