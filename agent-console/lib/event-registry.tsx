@@ -13,6 +13,13 @@ export interface EventDefinition<TData extends object> {
   render: EventRenderer<TData>;
 }
 
+export interface LogEntry {
+  timestamp: Date;
+  eventType: string;
+  source: EventSource;
+  data: object;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createEventRegistry<T extends Record<string, EventDefinition<any>>>(config: T) {
   type EventKey = keyof T;

@@ -1,43 +1,17 @@
 "use client";
 import { ThemePicker } from "@/components/theme-picker";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { WideSwitch } from "@/components/wide-switch";
-import { getEventLevel, getEventMessage, renderEventLog, useLogger } from "@/hooks/use-logger";
-import { EventLevel, EventSource } from "@/lib/event-registry";
+import { getEventLevel, getEventMessage, useLogger } from "@/hooks/use-logger";
 import { EventType } from "@/lib/event-types";
-import { cn, formatDate } from "@/lib/utils";
-import { ArrowDownCircle, ArrowUpCircle, Server, Settings } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { LevelFilter } from "./level-filter";
-const getEventLevelColor = (level: EventLevel) => {
-  switch (level) {
-    case "info":
-      return "bg-blue-100 text-blue-800 border-blue-300";
-    case "warn":
-      return "bg-yellow-100 text-yellow-800 border-yellow-300";
-    case "error":
-      return "bg-red-100 text-red-800 border-red-300";
-  }
-};
-
-const getSourceIcon = (source: EventSource) => {
-  const baseClass = "h-4 w-4 mr-2";
-  switch (source) {
-    case "server":
-      return <ArrowDownCircle className={`${baseClass} text-green-600`} />;
-    case "client":
-      return <ArrowUpCircle className={`${baseClass} text-blue-600`} />;
-    case "system":
-      return <Settings className={`${baseClass} text-purple-600`} />;
-    default:
-      return <Server className={`${baseClass} text-gray-600`} />;
-  }
-};
+import { LogItem } from "./log-item";
 
 export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   className,
@@ -110,6 +84,7 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
       {typeof window === "undefined" ? null : (
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel className="py-4 min-w-[565px] max-w-[876px] flex flex-col">
+            {/* Actions */}
             <div className="mb-4 px-4 flex items-center justify-between gap-2">
               <LevelFilter
                 displayInfo={displayInfo}
@@ -140,37 +115,12 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
                 Clear All
               </Button>
             </div>
+            {/* Logs */}
             <div className="flex-1 relative">
               <div className="absolute inset-0">
                 <ScrollArea className="h-full">
                   {filteredLogs.map((logEntry, index) => (
-                    <div key={index} className="flex flex-col gap-2 px-4 py-3 border-b">
-                      <div className="flex items-center">
-                        <span className="text-sm text-muted-foreground mr-12">
-                          {formatDate(logEntry.timestamp)}
-                        </span>
-                        <div className="flex items-center w-18 mr-2">
-                          {getSourceIcon(logEntry.source)}
-                          <code className="text-xs font-medium text-muted-foreground">
-                            {logEntry.source}
-                          </code>
-                        </div>
-                        <code className={cn("text-[0.75em] px-1.5 py-[2px] rounded")}>
-                          {getEventMessage(logEntry)}
-                        </code>
-                        <div className="flex-1" />
-                        <Badge
-                          variant="outline"
-                          className={cn(
-                            getEventLevelColor(getEventLevel(logEntry)),
-                            "rounded-sm w-12 flex items-center justify-center"
-                          )}
-                        >
-                          {getEventLevel(logEntry)}
-                        </Badge>
-                      </div>
-                      {expandAll && renderEventLog(logEntry)}
-                    </div>
+                    <LogItem key={index} logEntry={logEntry} expandAll={expandAll} />
                   ))}
                 </ScrollArea>
               </div>
