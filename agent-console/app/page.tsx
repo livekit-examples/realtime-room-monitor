@@ -1,5 +1,7 @@
 "use client";
 
+import LK from "@/components/lk";
+import { ThemeSwitch } from "@/components/theme-switch";
 import {
   AgentState,
   BarVisualizer,
@@ -58,6 +60,11 @@ export default function Page() {
         <ControlBar onConnectButtonClicked={onConnectButtonClicked} agentState={agentState} />
         <RoomAudioRenderer />
         <NoAgentNotification state={agentState} /> */}
+        {/* Header */}
+        <div className="flex flex-row justify-between p-3 px-2 border-b border-accent">
+          <LK />
+          <ThemeSwitch />
+        </div>
         <ConsoleContainer />
       </LiveKitRoom>
     </main>
