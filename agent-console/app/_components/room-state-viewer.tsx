@@ -21,7 +21,13 @@ const getConnectionStateColor = (state: ConnectionState) => {
 
 export const RoomStateViewer = () => {
   const { room } = useLivekitState();
-  const { connectionState, name, metadata, connectionDetails, serverInfo } = room;
+  const {
+    connectionState,
+    name,
+    metadata,
+    connectionDetails: connectionDetailsData,
+    serverInfo,
+  } = room;
 
   const parsedMetadata = safeParseJSON(metadata);
   const serverDetails = {
@@ -31,7 +37,11 @@ export const RoomStateViewer = () => {
     version: serverInfo?.version,
   };
 
-  const { serverUrl, participantName, participantToken } = connectionDetails;
+  const connectionDetails = {
+    serverUrl: connectionDetailsData?.serverUrl,
+    participantName: connectionDetailsData?.participantName,
+    participantToken: connectionDetailsData?.participantToken,
+  };
 
   return (
     <Card className="w-full">
@@ -68,14 +78,7 @@ export const RoomStateViewer = () => {
         <CollapsibleSection title="Connection Details">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <JsonPreview title="Room Metadata" data={parsedMetadata} />
-            <JsonPreview
-              title="Connection Configuration"
-              data={{
-                serverUrl,
-                token: participantToken,
-                participantIdentity: participantName,
-              }}
-            />
+            <JsonPreview title="Connection Configuration" data={connectionDetails} />
           </div>
         </CollapsibleSection>
 
@@ -96,7 +99,7 @@ const safeParseJSON = (data?: string): unknown => {
   try {
     return data ? JSON.parse(data) : null;
   } catch (error) {
-    return { error: "Invalid JSON format", rawData: data };
+    return { error: `Invalid JSON format ${error}`, rawData: data };
   }
 };
 
