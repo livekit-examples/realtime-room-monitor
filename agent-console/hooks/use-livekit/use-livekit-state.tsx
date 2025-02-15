@@ -1,17 +1,31 @@
-import { useConnectionState, useLocalParticipant, useRoomInfo } from "@livekit/components-react";
+import {
+  useConnectionState,
+  useLocalParticipant,
+  useRoomContext,
+  useRoomInfo,
+} from "@livekit/components-react";
+import { useMemo } from "react";
 import { useConnectionDetails } from "./use-conn-details";
 
 export const useLivekitRoomState = () => {
   const { connectionDetails } = useConnectionDetails();
 
+  const { activeSpeakers, serverInfo, localParticipant } = useRoomContext();
   const { name, metadata } = useRoomInfo();
   const connectionState = useConnectionState();
+
+  const activeSpeakerNames = useMemo(() => {
+    return Array.from(activeSpeakers.values()).map((participant) => participant.name);
+  }, [activeSpeakers]);
 
   return {
     connectionDetails,
     connectionState,
     name,
     metadata,
+    activeSpeakerNames,
+    serverInfo,
+    localParticipant,
   };
 };
 
