@@ -45,7 +45,7 @@ export default function Page() {
   return (
     <main className="h-full w-full bg-background">
       <LiveKitRoom
-        className="w-full h-full"
+        className="w-full h-full flex flex-col"
         token={connectionDetails?.participantToken}
         serverUrl={connectionDetails?.serverUrl}
         connect={connectionDetails !== undefined}

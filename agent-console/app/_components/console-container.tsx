@@ -101,7 +101,7 @@ export const ConsoleContainer = () => {
   }, [appendLog]);
 
   return (
-    <div className="w-full h-full flex flex-row" suppressHydrationWarning>
+    <div className="w-full flex-1 flex flex-row" suppressHydrationWarning>
       {typeof window === "undefined" ? null : (
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel className="p-4 min-w-[565px] max-w-[876px]">
