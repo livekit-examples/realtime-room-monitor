@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { WideSwitch } from "@/components/wide-switch";
 import { getEventLevel, getEventMessage, renderEventLog, useLogger } from "@/hooks/use-logger";
@@ -13,7 +14,6 @@ import { cn, formatDate } from "@/lib/utils";
 import { ArrowDownCircle, ArrowUpCircle, Server, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 import { LevelFilter } from "./level-filter";
-
 const getEventLevelColor = (level: EventLevel) => {
   switch (level) {
     case "info":
@@ -39,7 +39,10 @@ const getSourceIcon = (source: EventSource) => {
   }
 };
 
-export const ConsoleContainer = () => {
+export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
+  className,
+  ...rest
+}) => {
   const { logs, appendLog, clear } = useLogger();
   const [query, setQuery] = useState("");
   const [expandAll, setExpandAll] = useState<boolean>(false);
@@ -91,21 +94,23 @@ export const ConsoleContainer = () => {
       "system"
     );
 
-    appendLog(
-      "system.participant_reconnected",
-      {
-        id: "123",
-      },
-      "server"
-    );
+    for (let i = 0; i < 100; i++) {
+      appendLog(
+        "system.participant_reconnected",
+        {
+          id: "123",
+        },
+        "server"
+      );
+    }
   }, [appendLog]);
 
   return (
-    <div className="w-full flex-1 flex flex-row" suppressHydrationWarning>
+    <div className={cn("w-full flex flex-row", className)} {...rest}>
       {typeof window === "undefined" ? null : (
         <ResizablePanelGroup direction="horizontal">
-          <ResizablePanel className="p-4 min-w-[565px] max-w-[876px]">
-            <div className="mb-4 flex items-center justify-between gap-2">
+          <ResizablePanel className="py-4 min-w-[565px] max-w-[876px] flex flex-col">
+            <div className="mb-4 px-4 flex items-center justify-between gap-2">
               <LevelFilter
                 displayInfo={displayInfo}
                 displayWarn={displayWarn}
@@ -135,36 +140,40 @@ export const ConsoleContainer = () => {
                 Clear All
               </Button>
             </div>
-            <div className="h-[calc(100%-52px)] overflow-y-auto border rounded-lg shadow-sm">
-              {filteredLogs.map((logEntry, index) => (
-                <div key={index} className="flex flex-col gap-2 py-3 px-3 shadow-sm border-b">
-                  <div className="flex items-center">
-                    <span className="text-sm text-muted-foreground mr-12">
-                      {formatDate(logEntry.timestamp)}
-                    </span>
-                    <div className="flex items-center w-18 mr-2">
-                      {getSourceIcon(logEntry.source)}
-                      <code className="text-xs font-medium text-muted-foreground">
-                        {logEntry.source}
-                      </code>
+            <div className="flex-1 relative">
+              <div className="absolute inset-0">
+                <ScrollArea className="h-full">
+                  {filteredLogs.map((logEntry, index) => (
+                    <div key={index} className="flex flex-col gap-2 px-4 py-3 border-b">
+                      <div className="flex items-center">
+                        <span className="text-sm text-muted-foreground mr-12">
+                          {formatDate(logEntry.timestamp)}
+                        </span>
+                        <div className="flex items-center w-18 mr-2">
+                          {getSourceIcon(logEntry.source)}
+                          <code className="text-xs font-medium text-muted-foreground">
+                            {logEntry.source}
+                          </code>
+                        </div>
+                        <code className={cn("text-[0.75em] px-1.5 py-[2px] rounded")}>
+                          {getEventMessage(logEntry)}
+                        </code>
+                        <div className="flex-1" />
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            getEventLevelColor(getEventLevel(logEntry)),
+                            "rounded-sm w-12 flex items-center justify-center"
+                          )}
+                        >
+                          {getEventLevel(logEntry)}
+                        </Badge>
+                      </div>
+                      {expandAll && renderEventLog(logEntry)}
                     </div>
-                    <code className={cn("text-[0.75em] px-1.5 py-[2px] rounded")}>
-                      {getEventMessage(logEntry)}
-                    </code>
-                    <div className="flex-1" />
-                    <Badge
-                      variant="outline"
-                      className={cn(
-                        getEventLevelColor(getEventLevel(logEntry)),
-                        "rounded-sm w-12 flex items-center justify-center"
-                      )}
-                    >
-                      {getEventLevel(logEntry)}
-                    </Badge>
-                  </div>
-                  {expandAll && renderEventLog(logEntry)}
-                </div>
-              ))}
+                  ))}
+                </ScrollArea>
+              </div>
             </div>
           </ResizablePanel>
           <ResizableHandle withHandle />

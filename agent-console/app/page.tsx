@@ -43,7 +43,7 @@ export default function Page() {
   }, []);
 
   return (
-    <main className="h-full w-full bg-background">
+    <main className="h-full w-full bg-accent">
       <LiveKitRoom
         className="w-full h-full flex flex-col"
         token={connectionDetails?.participantToken}
@@ -61,11 +61,13 @@ export default function Page() {
         <RoomAudioRenderer />
         <NoAgentNotification state={agentState} /> */}
         {/* Header */}
-        <div className="flex flex-row justify-between p-3 px-2 border-b border-accent">
+        <div className="flex flex-row justify-between p-3 px-2 pb-1">
           <LK />
           <ThemeSwitch />
         </div>
-        <ConsoleContainer />
+        <div className="flex-1 p-2">
+          <ConsoleContainer className="h-full shadow-sm rounded-md bg-background" />
+        </div>
       </LiveKitRoom>
     </main>
   );

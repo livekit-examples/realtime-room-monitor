@@ -17,7 +17,7 @@ export function ThemeSwitch() {
 
   return (
     <div
-      className="group inline-flex items-center gap-2"
+      className="group inline-flex items-center gap-2 pr-3.5"
       data-state={theme === "dark" ? "checked" : "unchecked"}
     >
       <span
