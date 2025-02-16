@@ -63,7 +63,7 @@ export const ParticipantTrackViewer = ({ tracks }: Pick<LivekitParticipantState,
                 <category.icon className="h-4 w-4" />
                 {category.label}
                 {trackCount > 0 && (
-                  <Badge variant="secondary" className="h-5 w-5 p-0">
+                  <Badge className="ms-1.5 h-5 min-w-5" variant="secondary">
                     {trackCount}
                   </Badge>
                 )}
