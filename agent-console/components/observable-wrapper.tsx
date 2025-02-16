@@ -18,7 +18,7 @@ export const ObservableWrapper = <T extends object>({
   const { displayJson, setDisplayJson } = useDisplayJson();
 
   return (
-    <Card className="w-full">
+    <Card className="w-full rounded-lg">
       <Tabs
         value={displayJson ? "json" : "view"}
         onValueChange={(value) => setDisplayJson(value === "json")}
