@@ -23,7 +23,7 @@ export const ObservableWrapper = <T extends object>({
         value={displayJson ? "json" : "view"}
         onValueChange={(value) => setDisplayJson(value === "json")}
       >
-        <CardHeader>
+        <CardHeader className="pb-1">
           <CardTitle className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <div>

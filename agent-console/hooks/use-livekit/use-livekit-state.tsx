@@ -1,7 +1,6 @@
 import {
   useConnectionQualityIndicator,
   useConnectionState,
-  useIsMuted,
   useIsSpeaking,
   useParticipantAttributes,
   useParticipantInfo,
@@ -38,23 +37,19 @@ export const useLivekitRoomState = () => {
 };
 
 export const useLivekitParticipantState = (participant: Participant | undefined) => {
-  const { isLocal, isMicrophoneEnabled, isScreenShareEnabled, isCameraEnabled, sid, joinedAt } =
-    useMemo(() => {
-      if (!participant) {
-        return {
-          isLocal: false,
-          isMicrophoneEnabled: false,
-          isScreenShareEnabled: false,
-          isCameraEnabled: false,
-          sid: "",
-          lastSpokeAt: undefined,
-          joinedAt: undefined,
-          connectionQuality: ConnectionQuality.Unknown,
-        };
-      }
+  const { isLocal, sid, joinedAt } = useMemo(() => {
+    if (!participant) {
+      return {
+        isLocal: false,
+        sid: "",
+        lastSpokeAt: undefined,
+        joinedAt: undefined,
+        connectionQuality: ConnectionQuality.Unknown,
+      };
+    }
 
-      return { ...participant, isLocal: isLocalParticipant(participant) };
-    }, [participant]);
+    return { ...participant, isLocal: isLocalParticipant(participant) };
+  }, [participant]);
 
   const { quality: connectionQuality } = useConnectionQualityIndicator({ participant });
   const isSpeaking = useIsSpeaking(participant);
@@ -79,6 +74,7 @@ export const useLivekitParticipantState = (participant: Participant | undefined)
   const screenShareAudioTracks = tracks.filter(
     (track) => track.source === Track.Source.ScreenShareAudio
   );
+
   const unknownTracks = tracks.filter((track) => track.source === Track.Source.Unknown);
 
   const audioLevel = useMemo(() => {
@@ -90,12 +86,6 @@ export const useLivekitParticipantState = (participant: Participant | undefined)
     if (microphoneTracks.length === 0) return undefined;
     return microphoneTracks[0].participant.lastSpokeAt;
   }, [microphoneTracks]);
-
-  const isMicrophoneMuted = useIsMuted(Track.Source.Microphone, { participant }); // eslint-disable-line
-  const isCameraMuted = useIsMuted(Track.Source.Camera, { participant }); // eslint-disable-line
-  const isScreenShareMuted = useIsMuted(Track.Source.ScreenShare, { participant }); // eslint-disable-line
-  const isScreenShareAudioMuted = useIsMuted(Track.Source.ScreenShareAudio, { participant }); // eslint-disable-line
-  const isUnknownMuted = useIsMuted(Track.Source.Unknown, { participant }); // eslint-disable-line
 
   const lastMicrophoneError = useMemo(() => {
     if (!participant) return undefined;
@@ -109,9 +99,6 @@ export const useLivekitParticipantState = (participant: Participant | undefined)
 
   return {
     isLocal,
-    isMicrophoneEnabled: isMicrophoneEnabled || false,
-    isScreenShareEnabled: isScreenShareEnabled || false,
-    isCameraEnabled: isCameraEnabled || false,
     connectionQuality: connectionQuality || ConnectionQuality.Unknown,
     audioLevel,
     sid,
@@ -123,13 +110,6 @@ export const useLivekitParticipantState = (participant: Participant | undefined)
     name,
     metadata,
     attributes,
-    muted: {
-      microphone: isMicrophoneMuted,
-      camera: isCameraMuted,
-      screenShare: isScreenShareMuted,
-      screenShareAudio: isScreenShareAudioMuted,
-      unknown: isUnknownMuted,
-    },
     tracks: {
       microphoneTracks,
       cameraTracks,

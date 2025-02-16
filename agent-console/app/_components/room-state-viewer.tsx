@@ -17,9 +17,12 @@ const getConnectionStateColor = (state: ConnectionState) => {
   }
 };
 
-export const RoomStateViewer = ({ state }: { state: LivekitRoomState }) => {
-  const { connectionState, metadata, connectionDetails, serverInfo } = state;
-
+export const RoomStateViewer = ({
+  connectionState,
+  metadata,
+  connectionDetails,
+  serverInfo,
+}: LivekitRoomState) => {
   const parsedMetadata = safeParseJSON(metadata);
   const serverDetails = {
     protocol: serverInfo?.protocol,
@@ -30,6 +33,12 @@ export const RoomStateViewer = ({ state }: { state: LivekitRoomState }) => {
 
   return (
     <div className="space-y-4">
+      <MetricBadge
+        label="Connection State"
+        value={connectionState}
+        className={getConnectionStateColor(connectionState)}
+      />
+
       <CollapsibleSection title="Connection Details">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <JsonPreview title="Room Metadata" data={parsedMetadata} />

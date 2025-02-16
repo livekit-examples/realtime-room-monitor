@@ -9,7 +9,7 @@ import { WideSwitch } from "@/components/wide-switch";
 import { useLivekitState } from "@/hooks/use-livekit";
 import { getEventLevel, getEventMessage, useLogger } from "@/hooks/use-logger";
 import { EventType } from "@/lib/event-types";
-import { cn } from "@/lib/utils";
+import { cn, withExcludedKeys, withIncludedKeys } from "@/lib/utils";
 import { ControlBar as LivekitControlBar, useConnectionState } from "@livekit/components-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
@@ -18,6 +18,7 @@ import { ConnectionButton } from "./connection-button";
 import { LevelFilter } from "./level-filter";
 import { LivekitStateTabs } from "./livekit-state-tabs";
 import { LogItem } from "./log-item";
+import { ParticipantTrackViewer } from "./participant-track-viewer";
 import { ParticipantViewer } from "./participant-viewer";
 import { RoomStateViewer } from "./room-state-viewer";
 
@@ -208,14 +209,21 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
                         title="Room State"
                         subtitle={room.name || "Not connected"}
                       >
-                        {(state) => <RoomStateViewer state={state} />}
+                        {(state) => <RoomStateViewer {...state} />}
                       </ObservableWrapper>
                       <ObservableWrapper
-                        state={localParticipant}
+                        state={withIncludedKeys(localParticipant, ["tracks"])}
+                        title="Participant Tracks"
+                        subtitle={localParticipant.identity}
+                      >
+                        {(state) => <ParticipantTrackViewer {...state} />}
+                      </ObservableWrapper>
+                      <ObservableWrapper
+                        state={withExcludedKeys(localParticipant, ["tracks"])}
                         title="Participant State"
                         subtitle={localParticipant.identity}
                       >
-                        {(state) => <ParticipantViewer state={state} />}
+                        {(state) => <ParticipantViewer {...state} />}
                       </ObservableWrapper>
                     </div>
                   </ScrollArea>

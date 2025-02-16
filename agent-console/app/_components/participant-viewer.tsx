@@ -6,15 +6,7 @@ import { LivekitParticipantState } from "@/hooks/use-livekit/use-livekit-state";
 
 import { cn, formatDate } from "@/lib/utils";
 import { ConnectionQuality, TrackPublication } from "livekit-client";
-import {
-  AlertCircle,
-  Mic,
-  MicOff,
-  ScreenShare,
-  ScreenShareOff,
-  Video,
-  VideoOff,
-} from "lucide-react";
+import { AlertCircle } from "lucide-react";
 
 const getConnectionQualityColor = (quality: ConnectionQuality) => {
   switch (quality) {
@@ -31,49 +23,19 @@ const getConnectionQualityColor = (quality: ConnectionQuality) => {
   }
 };
 
-export const ParticipantViewer = ({ state: participant }: { state: LivekitParticipantState }) => {
-  const {
-    identity,
-    metadata,
-    attributes,
-    connectionQuality,
-    isSpeaking,
-    lastSpokeAt,
-    audioLevel,
-    permissions,
-    tracks,
-    errors,
-  } = participant;
-
+export const ParticipantViewer = ({
+  identity,
+  metadata,
+  attributes,
+  connectionQuality,
+  isSpeaking,
+  lastSpokeAt,
+  audioLevel,
+  permissions,
+  errors,
+}: Omit<LivekitParticipantState, "tracks" | "muted">) => {
   return (
     <div className="space-y-4">
-      {/* Media Status */}
-      <CollapsibleSection title="Media Status">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <MediaStatusBadge
-            enabled={participant.isMicrophoneEnabled}
-            muted={participant.muted.microphone}
-            label="Microphone"
-            enabledIcon={<Mic className="h-4 w-4" />}
-            disabledIcon={<MicOff className="h-4 w-4" />}
-          />
-          <MediaStatusBadge
-            enabled={participant.isCameraEnabled}
-            muted={participant.muted.camera}
-            label="Camera"
-            enabledIcon={<Video className="h-4 w-4" />}
-            disabledIcon={<VideoOff className="h-4 w-4" />}
-          />
-          <MediaStatusBadge
-            enabled={participant.isScreenShareEnabled}
-            muted={participant.muted.screenShare}
-            label="Screen Share"
-            enabledIcon={<ScreenShare className="h-4 w-4" />}
-            disabledIcon={<ScreenShareOff className="h-4 w-4" />}
-          />
-        </div>
-      </CollapsibleSection>
-
       {/* Participant Metrics */}
       <CollapsibleSection title="Participant Metrics">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -94,7 +56,7 @@ export const ParticipantViewer = ({ state: participant }: { state: LivekitPartic
           />
           <MetricBadge
             label="Audio Level"
-            value={audioLevel ? Math.round(audioLevel * 100) : "N/A"}
+            value={audioLevel ? Math.round(audioLevel * 100) : 0}
             unit="%"
             className="bg-purple-100/20 text-purple-600"
           />
@@ -103,15 +65,6 @@ export const ParticipantViewer = ({ state: participant }: { state: LivekitPartic
             value={lastSpokeAt ? formatDate(lastSpokeAt) : "Never"}
             className="bg-orange-100/20 text-orange-600"
           />
-        </div>
-      </CollapsibleSection>
-
-      {/* Track Publications */}
-      <CollapsibleSection title="Track Publications">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <TrackPublicationGroup title="Microphone Tracks" tracks={tracks.microphoneTracks} />
-          <TrackPublicationGroup title="Camera Tracks" tracks={tracks.cameraTracks} />
-          <TrackPublicationGroup title="Screen Share Tracks" tracks={tracks.screenShareTracks} />
         </div>
       </CollapsibleSection>
 
