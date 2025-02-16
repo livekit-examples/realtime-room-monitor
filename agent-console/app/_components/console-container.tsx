@@ -67,6 +67,11 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
       name: "John Doed asdasdasd asdaasda sd",
     });
 
+    appendLog(EventType.System_ParticipantDisconnected, {
+      id: "123",
+      name: "John Doed asdasdasd asdaasda sd",
+    });
+
     appendLog(EventType.System_RoomDisconnected, {
       name: "Room 1",
     });
