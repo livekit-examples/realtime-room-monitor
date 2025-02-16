@@ -70,3 +70,15 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.agent-visualizer > .lk-audio-bar {
+  width: 72px;
+}
+
+.lk-agent-control-bar {
+  @apply border-t-0 p-0 h-min mr-4;
+}
+
+.lk-disconnect-button {
+  @apply h-[36px] hover:bg-[#6b221a] hover:text-[white] bg-[#31100c] border-[#6b221a];
+}

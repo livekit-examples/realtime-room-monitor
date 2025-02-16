@@ -1,10 +1,11 @@
+import { JsonPreview } from "@/components/json-preview";
 import { ObservableWrapper } from "@/components/observable-wrapper";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLivekitState } from "@/hooks/use-livekit";
 import { cn, withExcludedKeys, withIncludedKeys } from "@/lib/utils";
-import { useRemoteParticipants } from "@livekit/components-react";
+import { useMediaDeviceSelect, useRemoteParticipants } from "@livekit/components-react";
 import { House, UserRound, UsersRound } from "lucide-react";
 import { ParticipantTrackViewer } from "./participant-track-viewer";
 import { ParticipantViewer } from "./participant-viewer";
@@ -84,6 +85,27 @@ const LivekitStateContent = ({
 
 export const LivekitStateTabs = ({ defaultValue = "room", className }: LivekitStateTabsProps) => {
   const { room, localParticipant } = useLivekitState();
+  const {
+    devices: audioInDevices,
+    activeDeviceId: audioInActiveDeviceId,
+    // setActiveMediaDevice: setAudioInActiveDevice,
+  } = useMediaDeviceSelect({
+    kind: "audioinput",
+  });
+  const {
+    devices: audioOutDevices,
+    activeDeviceId: audioOutActiveDeviceId,
+    // setActiveMediaDevice: setAudioOutActiveDevice,
+  } = useMediaDeviceSelect({
+    kind: "audiooutput",
+  });
+  const {
+    devices: videoDevices,
+    activeDeviceId: videoActiveDeviceId,
+    // setActiveMediaDevice: setVideoActiveDevice,
+  } = useMediaDeviceSelect({
+    kind: "videoinput",
+  });
 
   return (
     <Tabs defaultValue={defaultValue} className={cn("h-full flex flex-col", className)}>
@@ -106,6 +128,19 @@ export const LivekitStateTabs = ({ defaultValue = "room", className }: LivekitSt
       <LivekitStateContent value="room">
         <ObservableWrapper state={room} title="Room State" subtitle={room.name || "Not connected"}>
           {(state) => <RoomStateViewer {...state} />}
+        </ObservableWrapper>
+        <ObservableWrapper
+          state={{
+            audioInDevices,
+            audioInActiveDeviceId,
+            audioOutDevices,
+            audioOutActiveDeviceId,
+            videoDevices,
+            videoActiveDeviceId,
+          }}
+          title="Media Devices"
+        >
+          {(state) => <JsonPreview displayDataTypes={false} collapsed={false} data={state} />}
         </ObservableWrapper>
       </LivekitStateContent>
       <LivekitStateContent value="local-participant">

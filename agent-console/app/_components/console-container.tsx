@@ -8,11 +8,12 @@ import { WideSwitch } from "@/components/wide-switch";
 import { getEventLevel, getEventMessage, useLogger } from "@/hooks/use-logger";
 import { EventType } from "@/lib/event-types";
 import { cn } from "@/lib/utils";
-import { ControlBar as LivekitControlBar, useConnectionState } from "@livekit/components-react";
+import { useConnectionState } from "@livekit/components-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ConnectionButton } from "./connection-button";
+import { ControlBar } from "./control-bar";
 import { LevelFilter } from "./level-filter";
 import { LivekitStateTabs } from "./livekit-state-tabs";
 import { LogItem } from "./log-item";
@@ -172,7 +173,7 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                       >
-                        <LivekitControlBar
+                        <ControlBar
                           className="border bg-muted rounded-md mt-4"
                           controls={{ leave: false }}
                         />
