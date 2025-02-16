@@ -6,6 +6,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useLivekitState } from "@/hooks/use-livekit";
+import { cn } from "@/lib/utils";
 import { supportsScreenSharing, ToggleSource } from "@livekit/components-core";
 import {
   CameraDisabledIcon,
@@ -28,8 +30,6 @@ export const ControlBar = ({ controls, saveUserChoices = true, ...props }: Contr
   const visibleControls = { leave: true, ...controls };
   const localPermissions = useLocalParticipantPermissions();
 
-  console.log("localPermissions", localPermissions);
-
   if (!localPermissions) {
     visibleControls.camera = false;
     visibleControls.chat = false;
@@ -44,7 +44,15 @@ export const ControlBar = ({ controls, saveUserChoices = true, ...props }: Contr
 
   const browserSupportsScreenSharing = supportsScreenSharing();
 
-  const [isScreenShareEnabled, setIsScreenShareEnabled] = React.useState(false);
+  const {
+    localParticipant: {
+      tracks: { microphoneTracks, cameraTracks, screenShareTracks },
+    },
+  } = useLivekitState();
+
+  const isMicrophoneEnabled = microphoneTracks.length > 0;
+  const isCameraEnabled = cameraTracks.length > 0;
+  const isScreenShareEnabled = screenShareTracks.length > 0;
 
   const {
     saveAudioInputEnabled,
@@ -120,37 +128,44 @@ const MediaDeviceControl = <T extends ToggleSource>({
     requestPermissions: true,
   });
 
-  console.log("devices", devices);
-  console.log("activeDeviceId", activeDeviceId);
-
   return (
     <div className="flex items-center gap-[1px] border rounded-md p-2">
-      <Button {...buttonProps} className="rounded-r-none h-9">
-        {enabled ? (
-          <EnabledIcon className="w-4 h-4 text-green-500" />
-        ) : (
-          <DisabledIcon className="w-4 h-4 text-red-500" />
+      <Button
+        {...buttonProps}
+        className={cn(
+          "h-9 min-w-[160px] transition-all",
+          enabled ? "rounded-r-none pr-4" : "rounded-md"
         )}
-        {label}
-      </Button>
-      <Select
-        value={activeDeviceId}
-        onValueChange={(value) => {
-          setActiveMediaDevice(value);
-          setDeviceId(value);
-        }}
       >
-        <SelectTrigger className="bg-primary border-none text-primary-foreground rounded-l-none h-9 hover:bg-primary/80 transition-all duration-200">
-          <SelectValue placeholder="Select device" />
-        </SelectTrigger>
-        <SelectContent>
-          {devices.map((device) => (
-            <SelectItem key={device.deviceId} value={device.deviceId}>
-              {device.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+        <div className="flex items-center gap-2">
+          {enabled ? (
+            <EnabledIcon className="w-4 h-4 text-green-500 mr-2" />
+          ) : (
+            <DisabledIcon className="w-4 h-4 text-red-500 mr-2" />
+          )}
+          <span>{label}</span>
+        </div>
+      </Button>
+      {enabled && (
+        <Select
+          value={activeDeviceId}
+          onValueChange={(value) => {
+            setActiveMediaDevice(value);
+            setDeviceId(value);
+          }}
+        >
+          <SelectTrigger className="bg-primary border-none text-primary-foreground rounded-l-none h-9 hover:bg-primary/80 transition-all duration-200 w-[300px]">
+            <SelectValue placeholder="Select device" />
+          </SelectTrigger>
+          <SelectContent>
+            {devices.map((device) => (
+              <SelectItem key={device.deviceId} value={device.deviceId}>
+                {device.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
     </div>
   );
 };
