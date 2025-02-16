@@ -56,7 +56,9 @@ export const JsonPreview = ({
         </ScrollArea>
       )}
       {!data && (
-        <div className="text-sm text-muted-foreground italic">No {title.toLowerCase()}</div>
+        <div className="text-sm text-muted-foreground italic">
+          No {title ? title.toLowerCase() : "data"}
+        </div>
       )}
     </div>
   );
