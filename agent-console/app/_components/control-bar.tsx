@@ -1,11 +1,20 @@
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { supportsScreenSharing, ToggleSource } from "@livekit/components-core";
 import {
+  CameraDisabledIcon,
+  CameraIcon,
   ControlBarProps,
-  MediaDeviceMenu,
   MicDisabledIcon,
   MicIcon,
-  TrackToggle,
+  ScreenShareIcon,
+  ScreenShareStopIcon,
   useLocalParticipantPermissions,
   useMaybeRoomContext,
   useMediaDeviceSelect,
@@ -15,13 +24,7 @@ import {
 import { Track } from "livekit-client";
 import React from "react";
 
-export const ControlBar = ({
-  variation,
-  controls,
-  saveUserChoices = true,
-  onDeviceError,
-  ...props
-}: ControlBarProps) => {
+export const ControlBar = ({ controls, saveUserChoices = true, ...props }: ControlBarProps) => {
   const visibleControls = { leave: true, ...controls };
   const localPermissions = useLocalParticipantPermissions();
 
@@ -39,15 +42,6 @@ export const ControlBar = ({
     visibleControls.chat ??= localPermissions.canPublishData && controls?.chat;
   }
 
-  const showIcon = React.useMemo(
-    () => variation === "minimal" || variation === "verbose",
-    [variation]
-  );
-  const showText = React.useMemo(
-    () => variation === "textOnly" || variation === "verbose",
-    [variation]
-  );
-
   const browserSupportsScreenSharing = supportsScreenSharing();
 
   const [isScreenShareEnabled, setIsScreenShareEnabled] = React.useState(false);
@@ -59,135 +53,104 @@ export const ControlBar = ({
     saveVideoInputDeviceId,
   } = usePersistentUserChoices({ preventSave: !saveUserChoices });
 
-  const microphoneOnChange = React.useCallback(
-    (enabled: boolean, isUserInitiated: boolean) =>
-      isUserInitiated ? saveAudioInputEnabled(enabled) : null,
-    [saveAudioInputEnabled]
-  );
-
-  const onScreenShareChange = React.useCallback(
-    (enabled: boolean) => {
-      setIsScreenShareEnabled(enabled);
-    },
-    [setIsScreenShareEnabled]
-  );
-
-  const cameraOnChange = React.useCallback(
-    (enabled: boolean, isUserInitiated: boolean) =>
-      isUserInitiated ? saveVideoInputEnabled(enabled) : null,
-    [saveVideoInputEnabled]
-  );
-
-  const { buttonProps: microphoneButtonProps, enabled: microphoneEnabled } = useTrackToggle({
-    source: Track.Source.Microphone,
-    onChange: microphoneOnChange,
-  });
-
-  const { buttonProps: cameraButtonProps, enabled: cameraEnabled } = useTrackToggle({
-    source: Track.Source.Camera,
-    onChange: cameraOnChange,
-  });
-
-  const { buttonProps: screenShareButtonProps, enabled: screenShareEnabled } = useTrackToggle({
-    source: Track.Source.ScreenShare,
-    onChange: onScreenShareChange,
-  });
-
   return (
     <div {...props}>
       {visibleControls.microphone && (
         <MediaDeviceControl
+          label="Microphone"
           source={Track.Source.Microphone}
+          kind="audioinput"
           setDeviceEnabled={saveAudioInputEnabled}
           setDeviceId={saveAudioInputDeviceId}
-          enabledIcon={<MicIcon />}
-          disabledIcon={<MicDisabledIcon />}
+          enabledIcon={MicIcon}
+          disabledIcon={MicDisabledIcon}
         />
       )}
-      {visibleControls.microphone && (
-        <div className="border rounded-md p-2 bg-red-500">
-          <TrackToggle
-            source={Track.Source.Microphone}
-            showIcon={showIcon}
-            onChange={microphoneOnChange}
-            onDeviceError={(error) => onDeviceError?.({ source: Track.Source.Microphone, error })}
-          >
-            {showText && "Microphone"}
-          </TrackToggle>
-          <div className="lk-button-group-menu">
-            <MediaDeviceMenu
-              kind="audioinput"
-              onActiveDeviceChange={(_kind, deviceId) =>
-                saveAudioInputDeviceId(deviceId ?? "default")
-              }
-            />
-          </div>
-        </div>
-      )}
       {visibleControls.camera && (
-        <div className="border rounded-md p-2 bg-blue-500">
-          <TrackToggle
-            source={Track.Source.Camera}
-            showIcon={showIcon}
-            onChange={cameraOnChange}
-            onDeviceError={(error) => onDeviceError?.({ source: Track.Source.Camera, error })}
-          >
-            {showText && "Camera"}
-          </TrackToggle>
-          <div className="lk-button-group-menu">
-            <MediaDeviceMenu
-              kind="videoinput"
-              onActiveDeviceChange={(_kind, deviceId) =>
-                saveVideoInputDeviceId(deviceId ?? "default")
-              }
-            />
-          </div>
-        </div>
+        <MediaDeviceControl
+          label="Camera"
+          source={Track.Source.Camera}
+          kind="videoinput"
+          setDeviceEnabled={saveVideoInputEnabled}
+          setDeviceId={saveVideoInputDeviceId}
+          enabledIcon={CameraIcon}
+          disabledIcon={CameraDisabledIcon}
+        />
       )}
       {visibleControls.screenShare && browserSupportsScreenSharing && (
-        <TrackToggle
+        <MediaDeviceControl
+          label="Screen Share"
           source={Track.Source.ScreenShare}
-          captureOptions={{ audio: true, selfBrowserSurface: "include" }}
-          showIcon={showIcon}
-          onChange={onScreenShareChange}
-          onDeviceError={(error) => onDeviceError?.({ source: Track.Source.ScreenShare, error })}
-        >
-          {showText && (isScreenShareEnabled ? "Stop screen share" : "Share screen")}
-        </TrackToggle>
+          kind="videoinput"
+          setDeviceEnabled={saveVideoInputEnabled}
+          setDeviceId={saveVideoInputDeviceId}
+          enabledIcon={ScreenShareIcon}
+          disabledIcon={ScreenShareStopIcon}
+        />
       )}
     </div>
   );
 };
 
 const MediaDeviceControl = <T extends ToggleSource>({
+  label,
   source,
   kind,
   setDeviceEnabled,
   setDeviceId,
-  enabledIcon,
-  disabledIcon,
+  enabledIcon: EnabledIcon,
+  disabledIcon: DisabledIcon,
 }: {
+  label: string;
   source: T;
   kind: MediaDeviceKind;
   setDeviceEnabled: (enabled: boolean) => void;
   setDeviceId: (deviceId: string) => void;
-  enabledIcon: React.ReactNode;
-  disabledIcon: React.ReactNode;
+  enabledIcon: React.ElementType;
+  disabledIcon: React.ElementType;
 }) => {
   const room = useMaybeRoomContext();
   const { buttonProps, enabled } = useTrackToggle({
     source,
     onChange: setDeviceEnabled,
   });
-  const { devices, className, activeDeviceId, setActiveMediaDevice } = useMediaDeviceSelect({
-    kind: kind,
-    room: room,
+  const { devices, activeDeviceId, setActiveMediaDevice } = useMediaDeviceSelect({
+    kind,
+    room,
     requestPermissions: true,
-    onError: (error) => {
-      // TODO: log error
-      console.error(error);
-    },
   });
 
-  return <Button {...buttonProps}>{enabled ? enabledIcon : disabledIcon}</Button>;
+  console.log("devices", devices);
+  console.log("activeDeviceId", activeDeviceId);
+
+  return (
+    <div className="flex items-center gap-[1px] border rounded-md p-2">
+      <Button {...buttonProps} className="rounded-r-none h-9">
+        {enabled ? (
+          <EnabledIcon className="w-4 h-4 text-green-500" />
+        ) : (
+          <DisabledIcon className="w-4 h-4 text-red-500" />
+        )}
+        {label}
+      </Button>
+      <Select
+        value={activeDeviceId}
+        onValueChange={(value) => {
+          setActiveMediaDevice(value);
+          setDeviceId(value);
+        }}
+      >
+        <SelectTrigger className="bg-primary border-none text-primary-foreground rounded-l-none h-9 hover:bg-primary/80 transition-all duration-200">
+          <SelectValue placeholder="Select device" />
+        </SelectTrigger>
+        <SelectContent>
+          {devices.map((device) => (
+            <SelectItem key={device.deviceId} value={device.deviceId}>
+              {device.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
 };
