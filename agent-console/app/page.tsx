@@ -36,9 +36,9 @@ export default function Page() {
       >
         {/* <SimpleVoiceAssistant onStateChange={setAgentState} />
         <ControlBar onConnectButtonClicked={onConnectButtonClicked} agentState={agentState} />
-        <RoomAudioRenderer />
         <NoAgentNotification state={agentState} /> */}
         {/* Header */}
+
         <div className="flex flex-row justify-between p-3 px-2 pb-1">
           <LK />
           <ThemeSwitch />

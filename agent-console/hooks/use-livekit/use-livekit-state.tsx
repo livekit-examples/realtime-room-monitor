@@ -8,8 +8,10 @@ import {
   useParticipantPermissions,
   useParticipants,
   useParticipantTracks,
+  useRemoteParticipants,
   useRoomContext,
   useRoomInfo,
+  useSpeakingParticipants,
 } from "@livekit/components-react";
 import {
   ConnectionQuality,
@@ -128,15 +130,32 @@ export const useLivekitParticipantState = (participant: Participant | undefined)
   };
 };
 
+export const useLivekitRemoteParticipants = () => {
+  const remoteParticipants = useRemoteParticipants();
+  const activeSpeakers = useSpeakingParticipants();
+
+  const activeSpeakerIdentities = useMemo(
+    () => activeSpeakers.filter((p) => !isLocalParticipant(p)).map((p) => p.identity),
+    [activeSpeakers]
+  );
+
+  return {
+    remoteParticipants,
+    activeSpeakerIdentities,
+  };
+};
+
 export const useLivekitState = () => {
   const room = useLivekitRoomState();
   const participants = useParticipants();
   const localParticipant = participants.find((p) => isLocalParticipant(p));
   const localParticipantState = useLivekitParticipantState(localParticipant);
+  const remoteParticipants = useLivekitRemoteParticipants();
 
   return {
     room,
     localParticipant: localParticipantState,
+    remoteParticipants,
   };
 };
 

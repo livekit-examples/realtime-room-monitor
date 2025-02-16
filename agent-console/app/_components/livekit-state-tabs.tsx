@@ -8,6 +8,7 @@ import { useRemoteParticipants } from "@livekit/components-react";
 import { House, UserRound, UsersRound } from "lucide-react";
 import { ParticipantTrackViewer } from "./participant-track-viewer";
 import { ParticipantViewer } from "./participant-viewer";
+import { RemoteParticipantsViewer } from "./remote-participants-viewer";
 import { RoomStateViewer } from "./room-state-viewer";
 
 export interface LivekitStateTabsProps {
@@ -110,22 +111,22 @@ export const LivekitStateTabs = ({ defaultValue = "room", className }: LivekitSt
       </LivekitStateContent>
       <LivekitStateContent value="local-participant">
         <ObservableWrapper
-          state={withIncludedKeys(localParticipant, ["tracks"])}
-          title="Participant Tracks"
-          subtitle={localParticipant.identity}
-        >
-          {(state) => <ParticipantTrackViewer {...state} />}
-        </ObservableWrapper>
-        <ObservableWrapper
           state={withExcludedKeys(localParticipant, ["tracks"])}
           title="Participant State"
           subtitle={localParticipant.identity}
         >
           {(state) => <ParticipantViewer {...state} />}
         </ObservableWrapper>
+        <ObservableWrapper
+          state={withIncludedKeys(localParticipant, ["tracks"])}
+          title="Participant Tracks"
+          subtitle={localParticipant.identity}
+        >
+          {(state) => <ParticipantTrackViewer {...state} />}
+        </ObservableWrapper>
       </LivekitStateContent>
       <LivekitStateContent value="remote-participants">
-        <p className="pt-1 text-center text-xs text-muted-foreground">Content for Tab 3</p>
+        <RemoteParticipantsViewer />
       </LivekitStateContent>
     </Tabs>
   );

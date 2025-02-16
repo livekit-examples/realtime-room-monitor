@@ -1,6 +1,6 @@
 import { AccessToken, AccessTokenOptions, VideoGrant } from "livekit-server-sdk";
 import { NextResponse } from "next/server";
-
+import { Config, adjectives, animals, colors, uniqueNamesGenerator } from "unique-names-generator";
 // NOTE: you are expected to define the following environment variables in `.env.local`:
 const API_KEY = process.env.LIVEKIT_API_KEY;
 const API_SECRET = process.env.LIVEKIT_API_SECRET;
@@ -28,8 +28,14 @@ export async function GET() {
       throw new Error("LIVEKIT_API_SECRET is not defined");
     }
 
+    const config: Config = {
+      dictionaries: [colors, adjectives, animals],
+      separator: "-",
+      length: 3,
+    };
+
     // Generate participant token
-    const participantIdentity = `voxant-test-user`;
+    const participantIdentity = uniqueNamesGenerator(config);
     const roomName = `voxant-test-room`;
     const participantToken = await createParticipantToken(
       { identity: participantIdentity },

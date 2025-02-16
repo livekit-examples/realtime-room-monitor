@@ -8,7 +8,7 @@ import { WideSwitch } from "@/components/wide-switch";
 import { getEventLevel, getEventMessage, useLogger } from "@/hooks/use-logger";
 import { EventType } from "@/lib/event-types";
 import { cn } from "@/lib/utils";
-import { useConnectionState } from "@livekit/components-react";
+import { RoomAudioRenderer, useConnectionState } from "@livekit/components-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -197,6 +197,7 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
               {/* <ControlBar className="m-4" /> */}
               {/* <ThemePicker /> */}
               {/* <VoiceAssistantControlBar controls={{ leave: false }} /> */}
+              <RoomAudioRenderer />
               <LivekitStateTabs className="m-4" />
             </div>
           </ResizablePanel>
