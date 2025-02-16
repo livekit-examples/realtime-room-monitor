@@ -45,10 +45,10 @@ export const JsonPreview = ({
     <div className="space-y-2">
       {title && <h4 className="text-sm font-medium">{title}</h4>}
       {data && (
-        <ScrollArea orientation="horizontal">
+        <ScrollArea className="border rounded-md" orientation="horizontal">
           <JsonView
             collapsed={collapsed}
-            className={cn("p-2", className)}
+            className={cn("p-2.5 pl-1.5 rounded-md", className)}
             value={convertToJson(data)}
             style={theme}
             displayDataTypes={displayDataTypes}
