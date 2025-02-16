@@ -2,8 +2,9 @@ import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LivekitParticipantState } from "@/hooks/use-livekit/use-livekit-state";
-import { TrackPublication } from "livekit-client";
+import { TrackReference } from "@livekit/components-react";
 import { ChevronDown, Headphones, Mic, ScreenShare, Video } from "lucide-react";
+import { useMemo } from "react";
 import { TrackViewer } from "./track-viewer";
 
 type TrackCategory = {
@@ -47,21 +48,30 @@ const trackCategories: TrackCategory[] = [
 ];
 
 export const ParticipantTrackViewer = ({ tracks }: Pick<LivekitParticipantState, "tracks">) => {
+  const tracksByCategory = useMemo(() => {
+    return trackCategories.map((category) => {
+      return {
+        ...category,
+        tracks: tracks[category.tracksKey as keyof typeof tracks],
+      };
+    });
+  }, [tracks]);
+
   return (
     <div className="w-full rounded-lg border bg-muted/30 p-4">
       <Tabs defaultValue="microphone">
         <TabsList className="grid w-full grid-cols-5">
-          {trackCategories.map((category) => {
-            const trackCount = tracks[category.tracksKey as keyof typeof tracks].length;
+          {tracksByCategory.map(({ label, icon: Icon, tracks }) => {
+            const trackCount = tracks.length;
             return (
               <TabsTrigger
-                key={category.label}
-                value={category.label.toLowerCase()}
+                key={label}
+                value={label.toLowerCase()}
                 className="flex items-center gap-2 text-xs"
                 disabled={trackCount === 0}
               >
-                <category.icon className="h-4 w-4" />
-                {category.label}
+                <Icon className="h-4 w-4" />
+                {label}
                 {trackCount > 0 && (
                   <Badge className="ms-1.5 h-5" variant="secondary">
                     {trackCount}
@@ -72,42 +82,36 @@ export const ParticipantTrackViewer = ({ tracks }: Pick<LivekitParticipantState,
           })}
         </TabsList>
 
-        {trackCategories.map((category) => {
-          const categoryTracks = tracks[category.tracksKey as keyof typeof tracks].map(
-            (track) => track.publication
-          );
-
+        {tracksByCategory.map(({ label, tracks }) => {
           return (
-            <TabsContent key={category.label} className="pt-2" value={category.label.toLowerCase()}>
-              {categoryTracks.length === 0 ? (
+            <TabsContent key={label} className="pt-2" value={label.toLowerCase()}>
+              {tracks.length === 0 ? (
                 <div className="p-4 text-center text-sm text-muted-foreground">
-                  No {category.label.toLowerCase()} tracks
+                  No {label.toLowerCase()} tracks
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {categoryTracks.map((track: TrackPublication) => (
-                    <>
-                      <Collapsible
-                        className="border rounded-md p-3"
-                        key={track.trackSid}
-                        defaultOpen={true}
-                      >
-                        <CollapsibleTrigger className="flex w-full items-center rounded-md justify-between bg-muted/75 p-2 hover:bg-muted transition-colors">
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono text-sm">
-                              {track.trackName || track.trackSid}
-                            </span>
-                            <Badge variant="outline" className="h-5 px-1.5 py-0 text-xs">
-                              {track.track?.kind}
-                            </Badge>
-                          </div>
-                          <ChevronDown className="h-4 w-4 transition-transform [&[data-state=open]]:rotate-180" />
-                        </CollapsibleTrigger>
-                        <CollapsibleContent className="pt-2">
-                          <TrackViewer track={track} />
-                        </CollapsibleContent>
-                      </Collapsible>
-                    </>
+                  {tracks.map((track: TrackReference) => (
+                    <Collapsible
+                      className="border rounded-md p-3"
+                      key={track.publication.trackSid}
+                      defaultOpen={true}
+                    >
+                      <CollapsibleTrigger className="flex w-full items-center rounded-md justify-between bg-muted/75 p-2 hover:bg-muted transition-colors">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-sm">
+                            {track.publication.trackName || track.publication.trackSid}
+                          </span>
+                          <Badge variant="outline" className="h-5 px-1.5 py-0 text-xs">
+                            {track.publication.kind}
+                          </Badge>
+                        </div>
+                        <ChevronDown className="h-4 w-4 transition-transform [&[data-state=open]]:rotate-180" />
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="pt-2">
+                        <TrackViewer track={track} />
+                      </CollapsibleContent>
+                    </Collapsible>
                   ))}
                 </div>
               )}

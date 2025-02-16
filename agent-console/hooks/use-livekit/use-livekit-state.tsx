@@ -1,6 +1,7 @@
 import {
   useConnectionQualityIndicator,
   useConnectionState,
+  useIsRecording,
   useIsSpeaking,
   useParticipantAttributes,
   useParticipantInfo,
@@ -25,7 +26,9 @@ export const useLivekitRoomState = () => {
 
   const { serverInfo } = useRoomContext();
   const { name, metadata } = useRoomInfo();
+
   const connectionState = useConnectionState();
+  const isRecording = useIsRecording();
 
   return {
     connectionDetails,
@@ -33,6 +36,7 @@ export const useLivekitRoomState = () => {
     name,
     metadata,
     serverInfo,
+    isRecording,
   };
 };
 

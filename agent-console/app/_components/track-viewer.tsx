@@ -2,24 +2,26 @@ import { CollapsibleSection } from "@/components/collapsible-section";
 import { JsonPreview } from "@/components/json-preview";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { TrackPublication } from "livekit-client";
+import { TrackReference } from "@livekit/components-react";
 
-export const TrackViewer = ({ track }: { track: TrackPublication }) => {
+export const TrackViewer = ({ track }: { track: TrackReference }) => {
+  const { source, publication } = track;
+
   const trackMetadata = {
-    "Track ID": track.trackSid,
-    "Track Name": track.trackName || undefined,
-    Kind: track.kind,
-    Source: track.source,
-    "Stream ID": track.track?.mediaStream?.id,
-    Bitrate: track.track?.currentBitrate
-      ? `${Math.round(track.track.currentBitrate / 1000)} kbps`
+    "Track ID": publication.trackSid,
+    "Track Name": publication.trackName || undefined,
+    Kind: publication.kind,
+    Source: source,
+    "Stream ID": publication.track?.mediaStream?.id,
+    Bitrate: publication.track?.currentBitrate
+      ? `${Math.round(publication.track.currentBitrate / 1000)} kbps`
       : undefined,
-    Dimensions: track.dimensions
-      ? `${track.dimensions.width}x${track.dimensions.height}`
+    Dimensions: publication.dimensions
+      ? `${publication.dimensions.width}x${publication.dimensions.height}`
       : undefined,
-    "Muted State": track.isMuted,
-    Encryption: track.isEncrypted,
-    Simulcast: track.simulcasted,
+    "Muted State": publication.isMuted,
+    Encryption: publication.isEncrypted,
+    Simulcast: publication.simulcasted,
   };
 
   return (
@@ -55,16 +57,16 @@ export const TrackViewer = ({ track }: { track: TrackPublication }) => {
       <CollapsibleSection title="Technical Details" defaultExpanded={false}>
         <JsonPreview
           data={{
-            sid: track.trackSid,
-            name: track.trackName,
-            kind: track.kind,
-            source: track.source,
-            muted: track.isMuted,
-            encrypted: track.isEncrypted,
-            simulcasted: track.simulcasted,
-            bitrate: track.track?.currentBitrate,
-            dimensions: track.dimensions,
-            mediaStream: track.track?.mediaStream?.id,
+            sid: publication.trackSid,
+            name: publication.trackName,
+            kind: publication.kind,
+            source: source,
+            muted: publication.isMuted,
+            encrypted: publication.isEncrypted,
+            simulcasted: publication.simulcasted,
+            bitrate: publication.track?.currentBitrate,
+            dimensions: publication.dimensions,
+            mediaStream: publication.track?.mediaStream?.id,
           }}
           collapsed={1}
           displayDataTypes={false}

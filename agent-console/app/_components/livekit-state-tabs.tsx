@@ -4,7 +4,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLivekitState } from "@/hooks/use-livekit";
 import { cn, withExcludedKeys, withIncludedKeys } from "@/lib/utils";
-import { useMediaDeviceSelect, useRemoteParticipants } from "@livekit/components-react";
+import { useRemoteParticipants } from "@livekit/components-react";
 import { House, UserRound, UsersRound } from "lucide-react";
 import { ParticipantTrackViewer } from "./participant-track-viewer";
 import { ParticipantViewer } from "./participant-viewer";
@@ -84,27 +84,6 @@ const LivekitStateContent = ({
 
 export const LivekitStateTabs = ({ defaultValue = "room", className }: LivekitStateTabsProps) => {
   const { room, localParticipant } = useLivekitState();
-  const {
-    devices: audioInDevices,
-    activeDeviceId: audioInActiveDeviceId,
-    // setActiveMediaDevice: setAudioInActiveDevice,
-  } = useMediaDeviceSelect({
-    kind: "audioinput",
-  });
-  const {
-    devices: audioOutDevices,
-    activeDeviceId: audioOutActiveDeviceId,
-    // setActiveMediaDevice: setAudioOutActiveDevice,
-  } = useMediaDeviceSelect({
-    kind: "audiooutput",
-  });
-  const {
-    devices: videoDevices,
-    activeDeviceId: videoActiveDeviceId,
-    // setActiveMediaDevice: setVideoActiveDevice,
-  } = useMediaDeviceSelect({
-    kind: "videoinput",
-  });
 
   return (
     <Tabs defaultValue={defaultValue} className={cn("h-full flex flex-col", className)}>

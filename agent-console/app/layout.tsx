@@ -1,3 +1,4 @@
+import "@livekit/components-styles";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Public_Sans } from "next/font/google";
