@@ -38,6 +38,7 @@ export const ParticipantViewer = ({ state: participant }: { state: LivekitPartic
     attributes,
     connectionQuality,
     isSpeaking,
+    lastSpokeAt,
     audioLevel,
     permissions,
     tracks,
@@ -69,6 +70,33 @@ export const ParticipantViewer = ({ state: participant }: { state: LivekitPartic
             label="Screen Share"
             enabledIcon={<ScreenShare className="h-4 w-4" />}
             disabledIcon={<ScreenShareOff className="h-4 w-4" />}
+          />
+        </div>
+      </CollapsibleSection>
+
+      {/* Participant Metrics */}
+      <CollapsibleSection title="Participant Metrics">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <MetricBadge
+            label="Identity"
+            value={identity}
+            className="bg-blue-100/20 text-blue-600 dark:text-blue-400"
+          />
+          <MetricBadge
+            label="Connection Quality"
+            value={connectionQuality}
+            className={getConnectionQualityColor(connectionQuality)}
+          />
+          <MetricBadge
+            label="Speaking"
+            value={isSpeaking ? "Yes" : "No"}
+            className={isSpeaking ? "bg-green-100/20 text-green-600" : "bg-red-100/20 text-red-600"}
+          />
+          <MetricBadge
+            label="Audio Level"
+            value={audioLevel ? Math.round(audioLevel * 100) : "N/A"}
+            unit="%"
+            className="bg-purple-100/20 text-purple-600"
           />
         </div>
       </CollapsibleSection>
