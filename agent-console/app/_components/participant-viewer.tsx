@@ -4,7 +4,7 @@ import { MetricBadge } from "@/components/metric-badge";
 import { Badge } from "@/components/ui/badge";
 import { LivekitParticipantState } from "@/hooks/use-livekit/use-livekit-state";
 
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { ConnectionQuality, TrackPublication } from "livekit-client";
 import {
   AlertCircle,
@@ -76,7 +76,7 @@ export const ParticipantViewer = ({ state: participant }: { state: LivekitPartic
 
       {/* Participant Metrics */}
       <CollapsibleSection title="Participant Metrics">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <MetricBadge
             label="Identity"
             value={identity}
@@ -97,6 +97,11 @@ export const ParticipantViewer = ({ state: participant }: { state: LivekitPartic
             value={audioLevel ? Math.round(audioLevel * 100) : "N/A"}
             unit="%"
             className="bg-purple-100/20 text-purple-600"
+          />
+          <MetricBadge
+            label="Last Spoke"
+            value={lastSpokeAt ? formatDate(lastSpokeAt) : "Never"}
+            className="bg-orange-100/20 text-orange-600"
           />
         </div>
       </CollapsibleSection>
