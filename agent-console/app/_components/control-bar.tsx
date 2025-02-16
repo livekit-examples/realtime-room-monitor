@@ -6,7 +6,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useLivekitState } from "@/hooks/use-livekit";
 import { cn } from "@/lib/utils";
 import { supportsScreenSharing, ToggleSource } from "@livekit/components-core";
 import {
@@ -45,16 +44,6 @@ export const ControlBar = ({ controls, saveUserChoices = true, ...props }: Contr
   const browserSupportsScreenSharing = supportsScreenSharing();
 
   const {
-    localParticipant: {
-      tracks: { microphoneTracks, cameraTracks, screenShareTracks },
-    },
-  } = useLivekitState();
-
-  const isMicrophoneEnabled = microphoneTracks.length > 0;
-  const isCameraEnabled = cameraTracks.length > 0;
-  const isScreenShareEnabled = screenShareTracks.length > 0;
-
-  const {
     saveAudioInputEnabled,
     saveVideoInputEnabled,
     saveAudioInputDeviceId,
@@ -62,9 +51,10 @@ export const ControlBar = ({ controls, saveUserChoices = true, ...props }: Contr
   } = usePersistentUserChoices({ preventSave: !saveUserChoices });
 
   return (
-    <div {...props}>
+    <div {...props} className="flex flex-wrap gap-4 p-4 bg-muted/30 rounded-lg mt-3">
       {visibleControls.microphone && (
         <MediaDeviceControl
+          className="flex-1 min-w-[300px]"
           label="Microphone"
           source={Track.Source.Microphone}
           kind="audioinput"
@@ -76,6 +66,7 @@ export const ControlBar = ({ controls, saveUserChoices = true, ...props }: Contr
       )}
       {visibleControls.camera && (
         <MediaDeviceControl
+          className="flex-1 min-w-[300px]"
           label="Camera"
           source={Track.Source.Camera}
           kind="videoinput"
@@ -87,6 +78,7 @@ export const ControlBar = ({ controls, saveUserChoices = true, ...props }: Contr
       )}
       {visibleControls.screenShare && browserSupportsScreenSharing && (
         <MediaDeviceControl
+          className="flex-1 min-w-[300px]"
           label="Screen Share"
           source={Track.Source.ScreenShare}
           kind="videoinput"
@@ -108,6 +100,7 @@ const MediaDeviceControl = <T extends ToggleSource>({
   setDeviceId,
   enabledIcon: EnabledIcon,
   disabledIcon: DisabledIcon,
+  className,
 }: {
   label: string;
   source: T;
@@ -116,6 +109,7 @@ const MediaDeviceControl = <T extends ToggleSource>({
   setDeviceId: (deviceId: string) => void;
   enabledIcon: React.ElementType;
   disabledIcon: React.ElementType;
+  className?: string;
 }) => {
   const room = useMaybeRoomContext();
   const { buttonProps, enabled } = useTrackToggle({
@@ -129,19 +123,27 @@ const MediaDeviceControl = <T extends ToggleSource>({
   });
 
   return (
-    <div className="flex items-center gap-[1px] border rounded-md p-2">
+    <div
+      className={cn(
+        "flex items-center gap-2 bg-background rounded-md p-2 transition-all",
+        "border group",
+        "flex-grow basis-[300px]",
+        className
+      )}
+    >
       <Button
         {...buttonProps}
+        variant="ghost"
         className={cn(
-          "h-9 min-w-[160px] transition-all",
-          enabled ? "rounded-r-none pr-4" : "rounded-md"
+          "h-9 px-4 transition-all duration-200",
+          enabled ? "justify-between" : "w-full"
         )}
       >
         <div className="flex items-center gap-2">
           {enabled ? (
-            <EnabledIcon className="w-4 h-4 text-green-500 mr-2" />
+            <EnabledIcon className="w-4 h-4 text-green-500" />
           ) : (
-            <DisabledIcon className="w-4 h-4 text-red-500 mr-2" />
+            <DisabledIcon className="w-4 h-4 text-red-500" />
           )}
           <span>{label}</span>
         </div>
@@ -154,7 +156,7 @@ const MediaDeviceControl = <T extends ToggleSource>({
             setDeviceId(value);
           }}
         >
-          <SelectTrigger className="bg-primary border-none text-primary-foreground rounded-l-none h-9 hover:bg-primary/80 transition-all duration-200 w-[300px]">
+          <SelectTrigger className="h-9 border-l flex-1 min-w-[160px] transition-all duration-200 group-hover:bg-muted/50">
             <SelectValue placeholder="Select device" />
           </SelectTrigger>
           <SelectContent>

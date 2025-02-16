@@ -1,4 +1,3 @@
-import { JsonPreview } from "@/components/json-preview";
 import { ObservableWrapper } from "@/components/observable-wrapper";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -128,19 +127,6 @@ export const LivekitStateTabs = ({ defaultValue = "room", className }: LivekitSt
       <LivekitStateContent value="room">
         <ObservableWrapper state={room} title="Room State" subtitle={room.name || "Not connected"}>
           {(state) => <RoomStateViewer {...state} />}
-        </ObservableWrapper>
-        <ObservableWrapper
-          state={{
-            audioInDevices,
-            audioInActiveDeviceId,
-            audioOutDevices,
-            audioOutActiveDeviceId,
-            videoDevices,
-            videoActiveDeviceId,
-          }}
-          title="Media Devices"
-        >
-          {(state) => <JsonPreview displayDataTypes={false} collapsed={false} data={state} />}
         </ObservableWrapper>
       </LivekitStateContent>
       <LivekitStateContent value="local-participant">
