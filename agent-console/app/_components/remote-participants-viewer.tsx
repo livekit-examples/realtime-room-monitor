@@ -17,12 +17,21 @@ export const RemoteParticipantsViewer = () => {
   );
 
   useEffect(() => {
-    if (remoteParticipants.length > 0) {
+    if (remoteParticipants.length > 0 && !selectedParticipant) {
       setSelectedParticipant(remoteParticipants[0]);
-    } else {
-      setSelectedParticipant(undefined);
+      return;
     }
-  }, [remoteParticipants]);
+
+    if (remoteParticipants.length === 0 && selectedParticipant) {
+      setSelectedParticipant(undefined);
+      return;
+    }
+
+    if (selectedParticipant && !remoteParticipants.includes(selectedParticipant)) {
+      setSelectedParticipant(undefined);
+      return;
+    }
+  }, [remoteParticipants, selectedParticipant]);
 
   const remoteParticipantIdentities = remoteParticipants.map((p) => p.identity);
 
