@@ -5,24 +5,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLivekitState } from "@/hooks/use-livekit";
 import { cn, withExcludedKeys, withIncludedKeys } from "@/lib/utils";
 import { useRemoteParticipants } from "@livekit/components-react";
-import { House, UserRound, UsersRound } from "lucide-react";
+import { House, UserRound, UsersRound, Video } from "lucide-react";
 import { ParticipantTrackViewer } from "./participant-track-viewer";
 import { ParticipantViewer } from "./participant-viewer";
 import { RemoteParticipantsViewer } from "./remote-participants-viewer";
 import { RoomStateViewer } from "./room-state-viewer";
-
+import { VideoConference } from "./video-conference";
 export interface LivekitStateTabsProps {
   defaultValue?: string;
   className?: string;
 }
 
-export type TabValue =
-  | "room"
-  | "local-participant"
-  | "remote-participants"
-  | "team"
-  | "insights"
-  | "settings";
+export type TabValue = "room" | "local-participant" | "remote-participants" | "videos";
 
 export type TabItem = {
   label: string;
@@ -62,6 +56,11 @@ const tabItems: TabItem[] = [
     value: "remote-participants",
     icon: <UsersRound {...iconProps} />,
     indicator: <RemoteParticipantsIndicator />,
+  },
+  {
+    label: "Videos",
+    value: "videos",
+    icon: <Video {...iconProps} />,
   },
 ];
 
@@ -127,6 +126,9 @@ export const LivekitStateTabs = ({ defaultValue = "room", className }: LivekitSt
       </LivekitStateContent>
       <LivekitStateContent value="remote-participants">
         <RemoteParticipantsViewer />
+      </LivekitStateContent>
+      <LivekitStateContent value="videos">
+        <VideoConference />
       </LivekitStateContent>
     </Tabs>
   );

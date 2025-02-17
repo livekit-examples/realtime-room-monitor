@@ -12,6 +12,7 @@ import {
   useRoomContext,
   useRoomInfo,
   useSpeakingParticipants,
+  useTracks,
 } from "@livekit/components-react";
 import {
   ConnectionQuality,
@@ -145,17 +146,29 @@ export const useLivekitRemoteParticipants = () => {
   };
 };
 
+export const useLivekitVideoTracks = () => {
+  const cameraTracks = useTracks([Track.Source.Camera]);
+  const screenShareTracks = useTracks([Track.Source.ScreenShare]);
+
+  return {
+    cameraTracks,
+    screenShareTracks,
+  };
+};
+
 export const useLivekitState = () => {
   const room = useLivekitRoomState();
   const participants = useParticipants();
   const localParticipant = participants.find((p) => isLocalParticipant(p));
   const localParticipantState = useLivekitParticipantState(localParticipant);
   const remoteParticipants = useLivekitRemoteParticipants();
+  const tracks = useLivekitVideoTracks();
 
   return {
     room,
     localParticipant: localParticipantState,
     remoteParticipants,
+    tracks,
   };
 };
 

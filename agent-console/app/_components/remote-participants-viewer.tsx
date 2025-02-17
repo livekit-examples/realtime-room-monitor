@@ -67,7 +67,6 @@ export const RemoteParticipantsViewer = () => {
           </div>
         </div>
       </div>
-
       {/* Participant Details */}
       {selectedParticipant ? (
         <div className="p-4 space-y-8 overflow-y-auto ml-2 flex-1">
