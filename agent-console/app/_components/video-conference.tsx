@@ -60,15 +60,15 @@ export const VideoConference = () => {
         <h3 className="text-sm font-semibold text-foreground/80 flex items-center gap-2">
           <Video className="w-4 h-4" /> Camera Feeds ({cameraTracks.length})
         </h3>
-        <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2">
           {cameraTracks.map((track) => {
             const info = getTrackInfo(track);
             return (
               <div
                 key={track.publication.trackSid}
-                className="relative aspect-square bg-background rounded-xl overflow-hidden border group"
+                className="relative aspect-video bg-background rounded-xl overflow-hidden border"
               >
-                <VideoTrack className="w-full h-full object-cover" trackRef={track} />
+                <VideoTrack className="w-full h-full object-contain" trackRef={track} />
                 <TrackOverlay info={info} />
               </div>
             );
