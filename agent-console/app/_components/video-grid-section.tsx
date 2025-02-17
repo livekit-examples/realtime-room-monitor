@@ -1,8 +1,9 @@
 import { RecAvatar } from "@/components/rec-avatar";
+import { cn } from "@/lib/utils";
 import { TrackReference, VideoTrack } from "@livekit/components-react";
 import { Track } from "livekit-client";
 import { Maximize2, Mic, MicOff, Minimize2 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface VideoGridSectionProps {
   title: string;
@@ -35,12 +36,23 @@ const VideoGridItem = ({ track }: { track: TrackReference }) => {
   const videoRef = useRef<HTMLDivElement>(null);
   const info = getTrackInfo(track);
 
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
+  }, []);
+
   const toggleFullscreen = () => {
     if (videoRef.current) {
       if (!document.fullscreenElement) {
-        videoRef.current.requestFullscreen().then(() => setIsFullscreen(true));
+        videoRef.current.requestFullscreen();
       } else {
-        document.exitFullscreen().then(() => setIsFullscreen(false));
+        document.exitFullscreen();
       }
     }
   };
@@ -54,7 +66,12 @@ const VideoGridItem = ({ track }: { track: TrackReference }) => {
         className="w-full h-full object-contain group-[.fullscreen]:object-cover"
         trackRef={track}
       />
-      <TrackOverlay info={info} onFullscreen={toggleFullscreen} isFullscreen={isFullscreen} />
+      <TrackOverlay
+        info={info}
+        onFullscreen={toggleFullscreen}
+        isFullscreen={isFullscreen}
+        isScreenShare={info.isScreenShare}
+      />
     </div>
   );
 };
@@ -74,13 +91,25 @@ const TrackOverlay = ({
   info,
   onFullscreen,
   isFullscreen,
+  isScreenShare,
 }: {
   info: ReturnType<typeof getTrackInfo>;
   onFullscreen: () => void;
   isFullscreen: boolean;
+  isScreenShare: boolean;
 }) => (
-  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent p-4 flex flex-col justify-end">
-    <div className="flex items-center gap-3">
+  <div
+    className={cn(
+      "absolute inset-0 flex flex-col justify-end",
+      isScreenShare && !isFullscreen && "bg-black/30 backdrop-blur-sm"
+    )}
+  >
+    <div
+      className={cn(
+        "flex items-center gap-3 p-4 backdrop-blur-sm",
+        isFullscreen ? "bg-black/30" : "bg-black/10"
+      )}
+    >
       <RecAvatar
         name={info.participantName}
         isSpeaking={info.participant.isSpeaking}
@@ -89,11 +118,11 @@ const TrackOverlay = ({
       <div className="flex-1">
         <div className="text-sm font-medium text-white flex items-center gap-2">
           {info.participantName}
-          <span className="text-xs font-normal text-white/80">
+          <span className="text-xs font-normal text-white/90">
             ({info.isScreenShare ? "Screen" : "Camera"})
           </span>
         </div>
-        <div className="text-xs text-white/80 flex items-center gap-1.5">
+        <div className="text-xs text-white/90 flex items-center gap-1.5">
           {info.isMuted ? <MicOff className="w-3 h-3" /> : <Mic className="w-3 h-3" />}
           {info.trackName}
         </div>
