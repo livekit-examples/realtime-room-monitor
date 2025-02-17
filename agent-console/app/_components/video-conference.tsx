@@ -15,7 +15,6 @@ export const VideoConference = () => {
         tracks={screenShareTracks}
         className="[&_video]:bg-black"
       />
-
       <VideoGridSection
         title="Camera Feeds"
         icon={<Video className="w-4 h-4" />}
