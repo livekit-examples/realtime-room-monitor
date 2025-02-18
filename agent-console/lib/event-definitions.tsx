@@ -62,7 +62,7 @@ export const roomEventRegistry = {
   }),
   trackPublished: defineEvent<RoomEventReturn<"trackPublished">>({
     level: EventLevel.Info,
-    source: EventSource.Client,
+    source: EventSource.Server,
     message: ({ publication, participant }) =>
       isAgent(participant)
         ? `An agent "${participant.identity}" has published a ${publication.kind} track from ${publication.source} source`
