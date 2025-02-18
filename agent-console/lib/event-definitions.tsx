@@ -1,3 +1,4 @@
+import { ConnectionQuality, DataPacket_Kind } from "livekit-client";
 import { defineEvent, renderJson } from "./event-registry";
 import { EventLevel, EventSource, isAgent, RoomEventCallbackData } from "./event-types";
 
@@ -68,6 +69,80 @@ export const roomEventRegistry = {
         ? `An agent "${participant.identity}" has published a ${publication.kind} track from ${publication.source} source`
         : `A remote participant "${participant.identity}" has published a ${publication.kind} track from ${publication.source} source`,
     render: ({ publication, participant }) => renderJson({ publication, participant }),
+  }),
+  trackSubscribed: defineEvent<RoomEventReturn<"trackSubscribed">>({
+    level: EventLevel.Info,
+    source: EventSource.Server,
+    message: ({ track, participant }) =>
+      `${participant.identity} subscribed to ${track.source} track`,
+    render: ({ track, publication, participant }) =>
+      renderJson({ track, publication, participant }),
+  }),
+  trackSubscriptionFailed: defineEvent<RoomEventReturn<"trackSubscriptionFailed">>({
+    level: EventLevel.Error,
+    source: EventSource.Server,
+    message: ({ trackSid, reason, participant }) =>
+      `Track subscription from ${participant.identity} failed for ${trackSid}: ${reason}`,
+    render: ({ trackSid, participant, reason }) => renderJson({ trackSid, participant, reason }),
+  }),
+  trackUnpublished: defineEvent<RoomEventReturn<"trackUnpublished">>({
+    level: EventLevel.Info,
+    source: EventSource.Server,
+    message: ({ publication, participant }) =>
+      `${participant.identity} unpublished ${publication.kind} track`,
+    render: ({ publication, participant }) => renderJson({ publication, participant }),
+  }),
+  trackUnsubscribed: defineEvent<RoomEventReturn<"trackUnsubscribed">>({
+    level: EventLevel.Info,
+    source: EventSource.Client,
+    message: ({ track, participant }) =>
+      `Unsubscribed from ${track.source} track by ${participant.identity}`,
+    render: ({ track, publication, participant }) =>
+      renderJson({ track, publication, participant }),
+  }),
+  trackMuted: defineEvent<RoomEventReturn<"trackMuted">>({
+    level: EventLevel.Warn,
+    source: EventSource.Client,
+    message: ({ publication, participant }) =>
+      `${participant.identity} muted ${publication.kind} track`,
+    render: ({ publication, participant }) => renderJson({ publication, participant }),
+  }),
+  trackUnmuted: defineEvent<RoomEventReturn<"trackUnmuted">>({
+    level: EventLevel.Info,
+    source: EventSource.Client,
+    message: ({ publication, participant }) =>
+      `${participant.identity} unmuted ${publication.kind} track`,
+    render: ({ publication, participant }) => renderJson({ publication, participant }),
+  }),
+  localTrackPublished: defineEvent<RoomEventReturn<"localTrackPublished">>({
+    level: EventLevel.Info,
+    source: EventSource.Client,
+    message: ({ publication }) =>
+      `Published local ${publication.kind} track from ${publication.source}`,
+    render: ({ publication, participant }) => renderJson({ publication, participant }),
+  }),
+  dataReceived: defineEvent<RoomEventReturn<"dataReceived">>({
+    level: EventLevel.Info,
+    source: EventSource.Server,
+    message: ({ payload, kind, participant, topic }) =>
+      `Received data packet (${DataPacket_Kind[kind!]}, ${payload.length} bytes) from ${
+        participant?.identity
+      } on topic ${topic}`,
+    render: ({ payload, participant, kind, topic }) =>
+      renderJson({ payload, participant, kind, topic }),
+  }),
+  chatMessage: defineEvent<RoomEventReturn<"chatMessage">>({
+    level: EventLevel.Info,
+    source: EventSource.Client,
+    message: ({ message }) => `Chat: ${message.message}`,
+    render: ({ message, participant }) => renderJson({ ...message, participant }),
+  }),
+  connectionQualityChanged: defineEvent<RoomEventReturn<"connectionQualityChanged">>({
+    level: ({ quality }) =>
+      quality === ConnectionQuality.Excellent ? EventLevel.Info : EventLevel.Warn,
+    source: EventSource.Server,
+    message: ({ quality, participant }) => `${participant.identity} connection quality: ${quality}`,
+    render: ({ quality, participant }) => renderJson({ quality, participant }),
   }),
 };
 

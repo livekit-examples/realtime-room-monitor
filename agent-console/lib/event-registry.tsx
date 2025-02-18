@@ -121,5 +121,5 @@ export function createEventRegistry<T extends Record<string, EventDefinition<any
 }
 
 export const renderJson = <T extends object>(data: T) => (
-  <JsonPreview collapsed={2} displayDataTypes={false} data={data} />
+  <JsonPreview collapsed={1} displayDataTypes={false} data={data} />
 );
