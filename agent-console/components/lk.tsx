@@ -1,7 +1,7 @@
 "use client";
 
 import { useTheme } from "next-themes";
-
+import Link from "next/link";
 const LivekitLogo = () => {
   const { theme } = useTheme();
 
@@ -43,13 +43,8 @@ const LivekitLogo = () => {
 
 export default function LK() {
   return (
-    <a
-      href="https://livekit.io"
-      className="hover:opacity-70 transition-all duration-250 scale-[0.8]"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
+    <Link href="/" className="hover:opacity-70 transition-all duration-250 scale-[0.8]">
       <LivekitLogo />
-    </a>
+    </Link>
   );
 }

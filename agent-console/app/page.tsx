@@ -27,10 +27,21 @@ export default function Page() {
 
   return (
     <main className="h-full w-full bg-background flex items-center justify-center p-4 relative">
+      {/* Background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute left-0 top-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[100px] animate-float" />
+        <div className="absolute right-0 bottom-1/4 w-[500px] h-[500px] bg-secondary/20 rounded-full blur-[100px] animate-float-delayed" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/80 to-background" />
+      </div>
+
+      {/* Grid pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[size:40px_40px] dark:opacity-15" />
+
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
-      <div className="w-full max-w-2xl space-y-8">
+
+      <div className="w-full max-w-2xl space-y-8 relative z-10">
         <div className="text-center space-y-4">
           <div className="flex justify-center">
             <LK />
