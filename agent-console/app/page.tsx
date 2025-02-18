@@ -26,13 +26,16 @@ export default function Page() {
   };
 
   return (
-    <main className="h-full w-full bg-background flex items-center justify-center p-4 relative">
+    <main
+      className="h-full w-full bg-background flex items-center justify-center p-4 relative"
+      suppressHydrationWarning
+    >
       <div
         className="absolute inset-0
         bg-[linear-gradient(to_right,rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.03)_1px,transparent_1px)]
         bg-[size:40px_40px]
-        dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)]
-        dark:opacity-25"
+        dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.07)_2px,transparent_2px),linear-gradient(to_bottom,rgba(255,255,255,0.07)_2px,transparent_2px)]
+        dark:opacity-30"
       />
 
       <div className="absolute top-4 right-4">
