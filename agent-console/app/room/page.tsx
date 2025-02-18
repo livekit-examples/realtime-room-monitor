@@ -3,6 +3,7 @@
 import LK from "@/components/lk";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { useConnectionDetails } from "@/hooks/use-livekit";
+import { useRoomInfo } from "@/hooks/use-room-info";
 import { LivekitEventInstrumentor } from "@/providers/LivekitEventInstrumentor";
 import { LiveKitRoom } from "@livekit/components-react";
 import { MediaDeviceFailure } from "livekit-client";
@@ -15,6 +16,7 @@ export default function Page() {
   const router = useRouter();
 
   const { connectionDetails, updateConnectionDetails } = useConnectionDetails();
+  const { setRoomName, setUserId } = useRoomInfo();
 
   const roomId = searchParams.get("roomId");
   const userId = searchParams.get("userId");
@@ -22,8 +24,11 @@ export default function Page() {
   useEffect(() => {
     if (!roomId || !userId) {
       router.push("/");
+    } else {
+      setRoomName(roomId);
+      setUserId(userId);
     }
-  }, [roomId, userId, router]);
+  }, [roomId, userId, router, setRoomName, setUserId]);
 
   return (
     <main className="h-full w-full bg-accent">
