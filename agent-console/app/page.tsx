@@ -27,15 +27,13 @@ export default function Page() {
 
   return (
     <main className="h-full w-full bg-background flex items-center justify-center p-4 relative">
-      {/* Background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute left-0 top-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[100px] animate-float" />
-        <div className="absolute right-0 bottom-1/4 w-[500px] h-[500px] bg-secondary/20 rounded-full blur-[100px] animate-float-delayed" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/80 to-background" />
-      </div>
-
-      {/* Grid pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[size:40px_40px] dark:opacity-15" />
+      <div
+        className="absolute inset-0
+        bg-[linear-gradient(to_right,rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.03)_1px,transparent_1px)]
+        bg-[size:40px_40px]
+        dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)]
+        dark:opacity-25"
+      />
 
       <div className="absolute top-4 right-4">
         <ThemeToggle />
