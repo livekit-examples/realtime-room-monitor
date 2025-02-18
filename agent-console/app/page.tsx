@@ -1,75 +1,49 @@
 "use client";
 
-import LK from "@/components/lk";
-import { ThemeSwitch } from "@/components/theme-switch";
-import { useConnectionDetails } from "@/hooks/use-livekit";
-import { LivekitEventInstrumentor } from "@/providers/LivekitEventInstrumentor";
-import {
-  AgentState,
-  BarVisualizer,
-  LiveKitRoom,
-  useVoiceAssistant,
-} from "@livekit/components-react";
-import { MediaDeviceFailure } from "livekit-client";
-import { useEffect } from "react";
-import { ConsoleContainer } from "./_components/console-container";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useRoomInfo } from "@/hooks/use-room-info";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
-  const { connectionDetails, updateConnectionDetails } = useConnectionDetails();
+  const router = useRouter();
+  const { roomName, userId, setRoomName, setUserId } = useRoomInfo();
+
+  const handleJoinRoom = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      router.push(
+        `/room?roomId=${encodeURIComponent(roomName)}&userId=${encodeURIComponent(userId)}`
+      );
+    } catch (error) {
+      console.error("Connection failed:", error);
+    }
+  };
 
   return (
-    <main className="h-full w-full bg-accent">
-      <LiveKitRoom
-        className="w-full h-full flex flex-col"
-        token={connectionDetails?.participantToken}
-        serverUrl={connectionDetails?.serverUrl}
-        connect={connectionDetails !== undefined}
-        audio={true}
-        video={false}
-        onMediaDeviceFailure={onDeviceFailure}
-        onDisconnected={() => {
-          updateConnectionDetails(undefined);
-        }}
+    <main className="h-full w-full bg-accent flex items-center justify-center">
+      <form
+        onSubmit={handleJoinRoom}
+        className="bg-background p-8 rounded-lg space-y-4 min-w-[400px]"
       >
-        {/* <SimpleVoiceAssistant onStateChange={setAgentState} />
-        <ControlBar onConnectButtonClicked={onConnectButtonClicked} agentState={agentState} />
-        <NoAgentNotification state={agentState} /> */}
-        {/* Header */}
-        <LivekitEventInstrumentor>
-          <div className="flex flex-row justify-between p-3 px-2 pb-1">
-            <LK />
-            <ThemeSwitch />
-          </div>
-          <div className="flex-1 p-2">
-            <ConsoleContainer className="h-full shadow-sm rounded-md bg-background" />
-          </div>
-        </LivekitEventInstrumentor>
-      </LiveKitRoom>
+        <div className="space-y-2">
+          <Label htmlFor="roomName">Room Name</Label>
+          <Input
+            id="roomName"
+            value={roomName}
+            onChange={(e) => setRoomName(e.target.value)}
+            required
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="userId">User ID</Label>
+          <Input id="userId" value={userId} onChange={(e) => setUserId(e.target.value)} required />
+        </div>
+        <Button type="submit" className="w-full">
+          Join Room
+        </Button>
+      </form>
     </main>
-  );
-}
-
-function SimpleVoiceAssistant(props: { onStateChange: (state: AgentState) => void }) {
-  const { state, audioTrack } = useVoiceAssistant();
-  useEffect(() => {
-    props.onStateChange(state);
-  }, [props, state]);
-  return (
-    <div className="h-[300px] max-w-[90vw] mx-auto">
-      <BarVisualizer
-        state={state}
-        barCount={5}
-        trackRef={audioTrack}
-        className="agent-visualizer"
-        options={{ minHeight: 24 }}
-      />
-    </div>
-  );
-}
-
-function onDeviceFailure(error?: MediaDeviceFailure) {
-  console.error(error);
-  alert(
-    "Error acquiring camera or microphone permissions. Please make sure you grant the necessary permissions in your browser and reload the tab"
   );
 }

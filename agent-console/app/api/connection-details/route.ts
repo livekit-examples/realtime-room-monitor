@@ -1,6 +1,5 @@
 import { AccessToken, AccessTokenOptions, VideoGrant } from "livekit-server-sdk";
 import { NextResponse } from "next/server";
-import { Config, adjectives, animals, colors, uniqueNamesGenerator } from "unique-names-generator";
 // NOTE: you are expected to define the following environment variables in `.env.local`:
 const API_KEY = process.env.LIVEKIT_API_KEY;
 const API_SECRET = process.env.LIVEKIT_API_SECRET;
@@ -16,8 +15,16 @@ export type ConnectionDetails = {
   participantToken: string;
 };
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const roomName = searchParams.get("roomName");
+    const userId = searchParams.get("userId");
+
+    if (!roomName || !userId) {
+      throw new Error("Missing roomName or userId parameters");
+    }
+
     if (LIVEKIT_URL === undefined) {
       throw new Error("LIVEKIT_URL is not defined");
     }
@@ -28,33 +35,17 @@ export async function GET() {
       throw new Error("LIVEKIT_API_SECRET is not defined");
     }
 
-    const config: Config = {
-      dictionaries: [colors, adjectives, animals],
-      separator: "-",
-      length: 3,
-    };
+    // Generate participant token with provided values
+    const participantToken = await createParticipantToken({ identity: userId }, roomName);
 
-    // Generate participant token
-    const participantIdentity = uniqueNamesGenerator(config);
-    const roomName = `voxant-test-room`;
-    const participantToken = await createParticipantToken(
-      { identity: participantIdentity },
-      roomName
-    );
-
-    // Return connection details
     const data: ConnectionDetails = {
-      serverUrl: LIVEKIT_URL,
+      serverUrl: LIVEKIT_URL!,
       roomName,
-      participantToken: participantToken,
-      participantName: participantIdentity,
+      participantToken,
+      participantName: userId,
     };
 
-    const headers = new Headers({
-      "Cache-Control": "no-store",
-    });
-
-    return NextResponse.json(data, { headers });
+    return NextResponse.json(data, { headers: new Headers({ "Cache-Control": "no-store" }) });
   } catch (error) {
     if (error instanceof Error) {
       console.error(error);
