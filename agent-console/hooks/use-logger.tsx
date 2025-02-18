@@ -1,7 +1,7 @@
-import { EventRegistry, eventRegistry } from "@/lib/event-definitions";
+import { EventRegistry, roomEventRegistry } from "@/lib/event-definitions";
 import { createEventRegistry } from "@/lib/event-registry";
 
-const registry = createEventRegistry<EventRegistry>(eventRegistry);
+const registry = createEventRegistry<EventRegistry>(roomEventRegistry);
 
 export const { useLogger, renderEventLog, getEventLevel, getEventMessage } = registry;
 

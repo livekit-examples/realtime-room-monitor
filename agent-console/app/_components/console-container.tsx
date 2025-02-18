@@ -6,12 +6,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { WideSwitch } from "@/components/wide-switch";
 import { getEventLevel, getEventMessage, useLogger } from "@/hooks/use-logger";
-import { EventType } from "@/lib/event-types";
 import { cn } from "@/lib/utils";
 import { RoomAudioRenderer, useConnectionState } from "@livekit/components-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ConnectionButton } from "./connection-button";
 import { ControlBar } from "./control-bar";
 import { LevelFilter } from "./level-filter";
@@ -22,7 +21,7 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
   className,
   ...rest
 }) => {
-  const { logs, appendLog, clear } = useLogger();
+  const { logs, clear } = useLogger();
   const [query, setQuery] = useState("");
   const [expandAll, setExpandAll] = useState<boolean>(false);
   const [controlBarExpanded, setControlBarExpanded] = useState<boolean>(false);
@@ -45,7 +44,7 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
       getEventMessage(log),
       getEventLevel(log),
       log.eventType,
-      JSON.stringify(log.data),
+      ...Object.keys(log.data),
     ];
 
     const filtered = searchQuery.some((q) => q.toLowerCase().includes(query.toLowerCase()));
@@ -56,27 +55,6 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
         (displayError && getEventLevel(log) === "error"));
     return shouldDisplay;
   });
-
-  useEffect(() => {
-    appendLog(EventType.System_ParticipantConnected, {
-      id: "123",
-      name: "John Doe",
-    });
-
-    appendLog(EventType.System_ParticipantDisconnected, {
-      id: "123",
-      name: "John Doed asdasdasd asdaasda sd",
-    });
-
-    appendLog(EventType.System_ParticipantDisconnected, {
-      id: "123",
-      name: "John Doed asdasdasd asdaasda sd",
-    });
-
-    appendLog(EventType.System_RoomDisconnected, {
-      name: "Room 1",
-    });
-  }, [appendLog]);
 
   return (
     <div className={cn("w-full flex flex-row", className)} {...rest}>

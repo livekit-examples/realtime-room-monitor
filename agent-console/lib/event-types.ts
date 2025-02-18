@@ -7,6 +7,7 @@ import {
   LocalParticipant,
   LocalTrackPublication,
   Participant,
+  ParticipantKind,
   RemoteParticipant,
   RemoteTrack,
   RemoteTrackPublication,
@@ -17,16 +18,10 @@ import {
 } from "livekit-client";
 import { ParticipantPermission } from "livekit-server-sdk";
 
-export enum EventType {
-  System_ParticipantConnected = "system:participant_connected",
-  System_ParticipantDisconnected = "system:participant_disconnected",
-  System_TrackSubscribed = "system:track_subscribed",
-  System_TrackUnsubscribed = "system:track_unsubscribed",
-  System_DataReceived = "system:data_received",
-  System_RoomConnected = "system:room_connected",
-  System_RoomDisconnected = "system:room_disconnected",
-  System_TranscriptionReceived = "system:transcription_received",
-}
+export type EventMap = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: (...args: any[]) => void;
+};
 
 export enum EventLevel {
   Info = "info",
@@ -132,6 +127,10 @@ export type RoomEventCallbacks = {
   metricsReceived: (metrics: unknown, participant?: Participant) => void;
 };
 
+export const isAgent = (participant: Participant) => {
+  return participant.kind === ParticipantKind.AGENT;
+};
+
 export const getDisconnectReason = (reason: DisconnectReason | undefined) => {
   switch (reason) {
     case DisconnectReason.UNKNOWN_REASON:
@@ -176,11 +175,6 @@ export const getSubscriptionError = (error: SubscriptionError | undefined) => {
     default:
       return "Unknown subscription error";
   }
-};
-
-export type EventMap = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: (...args: any[]) => void;
 };
 
 export const roomEventCallbackData = {

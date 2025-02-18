@@ -12,6 +12,16 @@ export interface EventDefinition<TData extends object> {
   render: WithCallable<TData, React.ReactNode>;
 }
 
+export function extractTypeFromCallable<TData extends object, TType>(
+  callable: WithCallable<TData, TType>,
+  data: TData
+): TType {
+  if (typeof callable === "function") {
+    return (callable as (data: TData) => TType)(data);
+  }
+  return callable;
+}
+
 export function defineEvent<TData extends object>(
   definition: Omit<EventDefinition<TData>, "render"> & { render?: EventDefinition<TData>["render"] }
 ): EventDefinition<TData> {
@@ -40,9 +50,19 @@ export function createEventRegistry<T extends Record<string, EventDefinition<any
     filter: (query: string) => LogEntry<EventKey>[];
   }
 
-  const getEventSourceByType = (type: EventKey) => {
+  const getEventSourceByType = <K extends EventKey>(type: K, data: EventData<K>) => {
     const eventDefinition = config[type];
-    return eventDefinition.source;
+    return extractTypeFromCallable(eventDefinition.source, data);
+  };
+
+  const createLogEntry = <K extends EventKey>(type: K, data: EventData<K>): LogEntry<K> => {
+    const source = getEventSourceByType(type, data);
+    return {
+      timestamp: new Date(),
+      eventType: type,
+      source,
+      data,
+    };
   };
 
   const useStore = create<LoggerState>()(
@@ -51,10 +71,7 @@ export function createEventRegistry<T extends Record<string, EventDefinition<any
       logs: [],
       appendLog: (type, data) =>
         set((state) => ({
-          logs: [
-            { timestamp: new Date(), eventType: type, data, source: getEventSourceByType(type) },
-            ...state.logs,
-          ],
+          logs: [createLogEntry(type, data), ...state.logs],
         })),
       clear: () => set({ logs: [] }),
       filter: (query) => {
@@ -78,21 +95,21 @@ export function createEventRegistry<T extends Record<string, EventDefinition<any
     const { eventType, data } = log;
     const eventDefinition = config[eventType];
     const { render } = eventDefinition;
-    return typeof render === "function" ? render(data) : render;
+    return extractTypeFromCallable(render, data);
   };
 
   const getEventLevel = (log: LogEntry<EventKey>) => {
     const { eventType } = log;
     const eventDefinition = config[eventType];
     const { level } = eventDefinition;
-    return level;
+    return extractTypeFromCallable(level, log.data);
   };
 
   const getEventMessage = (log: LogEntry<EventKey>) => {
     const { eventType, data } = log;
     const eventDefinition = config[eventType];
     const { message } = eventDefinition;
-    return typeof message === "function" ? message(data) : message;
+    return extractTypeFromCallable(message, data);
   };
 
   return {
