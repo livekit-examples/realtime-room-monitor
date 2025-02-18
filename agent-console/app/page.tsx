@@ -1,6 +1,7 @@
 "use client";
 
 import LK from "@/components/lk";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -25,7 +26,10 @@ export default function Page() {
   };
 
   return (
-    <main className="h-full w-full bg-background flex items-center justify-center p-4">
+    <main className="h-full w-full bg-background flex items-center justify-center p-4 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-2xl space-y-8">
         <div className="text-center space-y-4">
           <div className="flex justify-center">
@@ -85,7 +89,7 @@ export default function Page() {
 
           <div className="pt-4 border-t">
             <a
-              href="https://github.com/yourusername/livekit-observatory"
+              href="https://github.com/LeetMock/voxant"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 text-muted-foreground hover:text-primary transition-colors"
