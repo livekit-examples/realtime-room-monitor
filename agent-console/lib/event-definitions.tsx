@@ -1,40 +1,21 @@
-import { defineEvent, renderJson } from "./event-registry";
-import { EventLevel, EventSource, EventType } from "./event-types";
+import { defineEvent } from "./event-registry";
+import { EventLevel, EventSource, RoomEventCallbackData } from "./event-types";
 
-export interface ParticipantConnectionData {
-  id: string;
-  name: string;
-}
+type RoomEventReturn<T extends keyof RoomEventCallbackData> = ReturnType<RoomEventCallbackData[T]>;
 
-export interface RoomConnectionData {
-  name: string;
-}
-
-export const participantConnectedEvent = defineEvent<ParticipantConnectionData>({
-  level: EventLevel.Info,
-  source: EventSource.System,
-  message: ({ name }) => `Participant ${name} connected`,
-  render: ({ name }) => renderJson({ name }),
-});
-
-export const participantDisconnectedEvent = defineEvent<ParticipantConnectionData>({
-  level: EventLevel.Error,
-  source: EventSource.System,
-  message: ({ name }) => `Participant ${name} disconnected`,
-  render: ({ name }) => renderJson({ name }),
-});
-
-export const roomReconnectedEvent = defineEvent<RoomConnectionData>({
-  level: EventLevel.Warn,
-  source: EventSource.System,
-  message: ({ name }) => `Room ${name} reconnected`,
-  render: ({ name }) => renderJson({ name }),
-});
-
-export const eventRegistry = {
-  [EventType.System_ParticipantConnected]: participantConnectedEvent,
-  [EventType.System_ParticipantDisconnected]: participantDisconnectedEvent,
-  [EventType.System_RoomDisconnected]: roomReconnectedEvent,
+export const roomEventRegistry = {
+  connected: defineEvent<RoomEventReturn<"connected">>({
+    level: EventLevel.Info,
+    source: EventSource.Client,
+    message: "Connected to room",
+    render: () => "Connected to room",
+  }),
+  disconnected: defineEvent<RoomEventReturn<"disconnected">>({
+    level: EventLevel.Info,
+    source: EventSource.Client,
+    message: "Disconnected from room",
+    render: () => "Disconnected from room",
+  }),
 };
 
-export type EventRegistry = typeof eventRegistry;
+export type EventRegistry = typeof roomEventRegistry;

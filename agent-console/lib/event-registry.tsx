@@ -2,17 +2,23 @@ import { JsonPreview } from "@/components/json-preview";
 import React from "react";
 import { create } from "zustand";
 import { EventLevel, EventSource } from "./event-types";
-export type EventRenderer<T extends object> = (data: T) => React.ReactNode;
+
+export type WithCallable<TData extends object, TType> = TType | ((data: TData) => TType);
 
 export interface EventDefinition<TData extends object> {
-  level: EventLevel;
-  source: EventSource;
-  message: string | ((data: TData) => string);
-  render: EventRenderer<TData>;
+  level: WithCallable<TData, EventLevel>;
+  source: WithCallable<TData, EventSource>;
+  message: WithCallable<TData, string>;
+  render: WithCallable<TData, React.ReactNode>;
 }
 
-export function defineEvent<TData extends object>(definition: EventDefinition<TData>) {
-  return definition;
+export function defineEvent<TData extends object>(
+  definition: Omit<EventDefinition<TData>, "render"> & { render?: EventDefinition<TData>["render"] }
+): EventDefinition<TData> {
+  const { render, ...rest } = definition;
+  const renderFn = render ?? (() => <div>No event details available</div>);
+
+  return { ...rest, render: renderFn };
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -72,7 +78,7 @@ export function createEventRegistry<T extends Record<string, EventDefinition<any
     const { eventType, data } = log;
     const eventDefinition = config[eventType];
     const { render } = eventDefinition;
-    return render?.(data);
+    return typeof render === "function" ? render(data) : render;
   };
 
   const getEventLevel = (log: LogEntry<EventKey>) => {
