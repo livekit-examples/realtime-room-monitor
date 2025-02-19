@@ -16,6 +16,7 @@ import { ControlBar } from "./control-bar";
 import { LevelFilter } from "./level-filter";
 import { LivekitStateTabs } from "./livekit-state-tabs";
 import { LogItem } from "./log-item";
+import { ServerActionPanel } from "./server-action-panel";
 
 export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   className,
@@ -201,8 +202,8 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
             </ResizablePanelGroup>
           </ResizablePanel>
           <ResizableHandle withHandle />
-          <ResizablePanel>
-            <div className="h-full flex flex-col"></div>
+          <ResizablePanel className="h-full flex flex-col">
+            <ServerActionPanel />
           </ResizablePanel>
         </ResizablePanelGroup>
       )}
