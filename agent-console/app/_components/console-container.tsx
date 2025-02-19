@@ -198,7 +198,7 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
                   {/* <ThemePicker /> */}
                   {/* <VoiceAssistantControlBar controls={{ leave: false }} /> */}
                   <RoomAudioRenderer />
-                  <LivekitStateTabs className="m-4" />
+                  <LivekitStateTabs className="m-4 mb-0" />
                 </div>
               </ResizablePanel>
               <ResizableHandle withHandle />

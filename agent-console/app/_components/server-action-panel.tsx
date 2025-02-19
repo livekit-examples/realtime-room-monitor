@@ -1,83 +1,46 @@
-import { JsonPreview } from "@/components/json-preview";
-import { Button } from "@/components/ui/button";
+import { ActionCard } from "@/components/action-card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useLivekitAction, useLivekitState } from "@/hooks/use-livekit";
 import { TabValue, useTabs } from "@/hooks/use-tabs";
 import { cn } from "@/lib/utils";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
 
 const RoomActionPanel = () => {
   const { room } = useLivekitState();
   const { updateRoomMetadata } = useLivekitAction();
   const [metadataInput, setMetadataInput] = useState(room.metadata || "");
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [response, setResponse] = useState<object | null>(null);
 
-  const handleUpdateMetadata = async () => {
-    if (!room.name) {
-      toast.error("No active room connection");
-      return;
-    }
-    if (!metadataInput || metadataInput === room.metadata) return;
-
-    toast.promise(
-      async () => {
-        setIsUpdating(true);
-        const response = await updateRoomMetadata({
+  return (
+    <ActionCard
+      title="Update Room Metadata"
+      description="Modify the metadata associated with this room"
+      action={async () => {
+        if (!room.name) throw new Error("No active room connection");
+        return updateRoomMetadata({
           roomName: room.name,
           metadata: metadataInput,
         });
-        setResponse(response);
-        return response;
-      },
-      {
-        loading: "Updating room metadata...",
-        success: () => {
-          setMetadataInput("");
-          return "Metadata updated successfully";
-        },
-        error: (error) => `Update failed: ${error.message}`,
-        finally: () => setIsUpdating(false),
-      }
-    );
-  };
-
-  return (
-    <div className="p-4 space-y-6">
+      }}
+      className="m-4"
+      disabled={!metadataInput || metadataInput === room.metadata}
+    >
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="room-metadata">Room Metadata</Label>
+          <Label htmlFor="room-metadata">New Metadata</Label>
           <Input
             id="room-metadata"
             value={metadataInput}
             onChange={(e) => setMetadataInput(e.target.value)}
-            placeholder="Enter metadata string"
-            disabled={isUpdating}
+            placeholder="Enter metadata (JSON recommended)"
           />
         </div>
-        <div className="space-y-4">
-          <div className="flex items-center gap-4">
-            <Button
-              onClick={handleUpdateMetadata}
-              disabled={isUpdating || !metadataInput || metadataInput === room.metadata}
-            >
-              {isUpdating ? "Updating..." : "Update Metadata"}
-            </Button>
-            {room.metadata && (
-              <span className="text-sm text-muted-foreground">Current: {room.metadata}</span>
-            )}
-          </div>
-
-          {response && (
-            <div className="border rounded-lg p-4 bg-muted/50">
-              <JsonPreview title="Response" data={response} />
-            </div>
-          )}
-        </div>
+        {room.metadata && (
+          <div className="text-sm text-muted-foreground">Current metadata: {room.metadata}</div>
+        )}
       </div>
-    </div>
+    </ActionCard>
   );
 };
 
@@ -108,18 +71,17 @@ export const ServerActionPanel: React.FC<React.HTMLAttributes<HTMLDivElement>> =
   const Panel = useMemo(() => tabValueToPanelMap[selectedTab], [selectedTab]);
 
   return (
-    <div className={cn("h-full flex flex-col bg-background p-6", className)} {...rest}>
-      <div className="rounded-xl border bg-card p-6 shadow-sm">
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold leading-none tracking-tight">
-            {selectedTabLabels[selectedTab]}
-          </h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {selectedTabDescriptions[selectedTab]}
-          </p>
-        </div>
-        <Panel />
+    <div className={cn("h-full flex flex-col bg-background", className)} {...rest}>
+      <div className="p-4 pt-5 border-b">
+        <h3 className="text-lg font-semibold leading-none tracking-tight">
+          {selectedTabLabels[selectedTab]}
+        </h3>
+        <p className="mt-1 text-sm text-muted-foreground">{selectedTabDescriptions[selectedTab]}</p>
       </div>
+      <ScrollArea>
+        <Panel />
+        <ScrollBar orientation="vertical" />
+      </ScrollArea>
     </div>
   );
 };
