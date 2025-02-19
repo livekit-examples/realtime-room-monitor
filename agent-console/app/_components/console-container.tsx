@@ -60,70 +60,72 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
   return (
     <div className={cn("w-full flex flex-row", className)} {...rest}>
       {typeof window === "undefined" ? null : (
-        <ResizablePanelGroup className="h-full" direction="vertical">
-          <ResizablePanel className="min-h-[200px]">
-            <ResizablePanelGroup direction="horizontal">
-              <ResizablePanel className="py-4 min-w-[450px] max-w-[876px] flex flex-col">
-                {/* Actions */}
-                <div className="px-4 flex items-center justify-between gap-2 pb-4 border-b">
-                  <LevelFilter
-                    displayInfo={displayInfo}
-                    displayWarn={displayWarn}
-                    displayError={displayError}
-                    setDisplayInfo={setDisplayInfo}
-                    setDisplayWarn={setDisplayWarn}
-                    setDisplayError={setDisplayError}
-                    numSelectedLevels={numSelectedLevels}
-                  />
-                  <Input
-                    placeholder="Filter logs..."
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                  />
-                  <TooltipProvider delayDuration={0}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <WideSwitch checked={expandAll} onCheckedChange={setExpandAll} />
-                      </TooltipTrigger>
-                      <TooltipContent className="dark px-2 py-1 text-xs">
-                        {expandAll ? "Collapse all logs" : "Expand all logs"}
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  <div className="h-6 w-px bg-border" />
-                  <Button variant="destructive" onClick={() => clear()} className="h-9 px-4">
-                    Clear All
-                  </Button>
-                </div>
-                {/* Logs */}
-                <div className="flex-1 relative">
-                  <div className="absolute inset-0">
-                    {filteredLogs.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center h-full text-center p-8">
-                        <div className="text-muted-foreground text-sm max-w-[500px] space-y-3 border bg-muted rounded-md p-8">
-                          <div className="space-y-2">
-                            <AlertCircle className="h-6 w-6 mx-auto text-muted-foreground/50" />
-                            <p className="font-medium">No matching logs found</p>
-                          </div>
-                          <p className="mt-2 opacity-75">
-                            Try adjusting your search query or level filters
-                          </p>
-                          <p className="mt-1 opacity-75">
-                            Interact with the room to see real-time events
-                          </p>
+        <ResizablePanelGroup direction="horizontal">
+          <ResizablePanel className="pt-4 flex flex-col" minSize={10} maxSize={60} collapsible>
+            <div className="h-full flex flex-col min-w-[500px]">
+              {/* Actions */}
+              <div className="px-4 flex items-center justify-between gap-2 pb-4 border-b">
+                <LevelFilter
+                  displayInfo={displayInfo}
+                  displayWarn={displayWarn}
+                  displayError={displayError}
+                  setDisplayInfo={setDisplayInfo}
+                  setDisplayWarn={setDisplayWarn}
+                  setDisplayError={setDisplayError}
+                  numSelectedLevels={numSelectedLevels}
+                />
+                <Input
+                  placeholder="Filter logs..."
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+                <TooltipProvider delayDuration={0}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <WideSwitch checked={expandAll} onCheckedChange={setExpandAll} />
+                    </TooltipTrigger>
+                    <TooltipContent className="dark px-2 py-1 text-xs">
+                      {expandAll ? "Collapse all logs" : "Expand all logs"}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <div className="h-6 w-px bg-border" />
+                <Button variant="destructive" onClick={() => clear()} className="h-9 px-4">
+                  Clear All
+                </Button>
+              </div>
+              {/* Logs */}
+              <div className="flex-1 relative pb-4">
+                <div className="absolute inset-0">
+                  {filteredLogs.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full text-center p-8">
+                      <div className="text-muted-foreground text-sm max-w-[500px] space-y-3 border bg-muted rounded-md p-8">
+                        <div className="space-y-2">
+                          <AlertCircle className="h-6 w-6 mx-auto text-muted-foreground/50" />
+                          <p className="font-medium">No matching logs found</p>
                         </div>
+                        <p className="mt-2 opacity-75">
+                          Try adjusting your search query or level filters
+                        </p>
+                        <p className="mt-1 opacity-75">
+                          Interact with the room to see real-time events
+                        </p>
                       </div>
-                    ) : (
-                      <ScrollArea className="h-full flex flex-col items-center justify-center">
-                        {filteredLogs.map((logEntry, index) => (
-                          <LogItem key={index} logEntry={logEntry} expandAll={expandAll} />
-                        ))}
-                      </ScrollArea>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    <ScrollArea className="h-full flex flex-col items-center justify-center">
+                      {filteredLogs.map((logEntry, index) => (
+                        <LogItem key={index} logEntry={logEntry} expandAll={expandAll} />
+                      ))}
+                    </ScrollArea>
+                  )}
                 </div>
-              </ResizablePanel>
-              <ResizableHandle withHandle />
+              </div>
+            </div>
+          </ResizablePanel>
+          <ResizableHandle withHandle />
+          <ResizablePanel>
+            <ResizablePanelGroup direction="vertical">
               <ResizablePanel>
                 <div className="h-full flex flex-col">
                   <div className="flex flex-col border-b p-4">
@@ -199,11 +201,11 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
                   <LivekitStateTabs className="m-4" />
                 </div>
               </ResizablePanel>
+              <ResizableHandle withHandle />
+              <ResizablePanel minSize={10} collapsible>
+                <ServerActionPanel />
+              </ResizablePanel>
             </ResizablePanelGroup>
-          </ResizablePanel>
-          <ResizableHandle withHandle />
-          <ResizablePanel className="h-full flex flex-col">
-            <ServerActionPanel />
           </ResizablePanel>
         </ResizablePanelGroup>
       )}
