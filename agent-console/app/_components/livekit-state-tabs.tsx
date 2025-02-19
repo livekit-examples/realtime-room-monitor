@@ -1,68 +1,18 @@
 import { ObservableWrapper } from "@/components/observable-wrapper";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLivekitState } from "@/hooks/use-livekit";
+import { tabItems, TabValue, useTabs } from "@/hooks/use-tabs";
 import { cn, withExcludedKeys, withIncludedKeys } from "@/lib/utils";
-import { useRemoteParticipants } from "@livekit/components-react";
-import { House, UserRound, UsersRound, Video } from "lucide-react";
 import { ParticipantTrackViewer } from "./participant-track-viewer";
 import { ParticipantViewer } from "./participant-viewer";
 import { RemoteParticipantsViewer } from "./remote-participants-viewer";
 import { RoomStateViewer } from "./room-state-viewer";
 import { VideoConference } from "./video-conference";
+
 export interface LivekitStateTabsProps {
-  defaultValue?: string;
   className?: string;
 }
-
-export type TabValue = "room" | "local-participant" | "remote-participants" | "videos";
-
-export type TabItem = {
-  label: string;
-  value: TabValue;
-  icon: React.ReactNode;
-  indicator?: React.ReactNode;
-};
-
-const RemoteParticipantsIndicator = () => {
-  const pc = useRemoteParticipants();
-  return (
-    <Badge className="ms-1.5 min-w-5 bg-primary/15" variant="secondary">
-      {pc.length}
-    </Badge>
-  );
-};
-
-const iconProps = {
-  className: "-ms-0.5 me-1.5 opacity-60",
-  size: 16,
-  strokeWidth: 2,
-};
-
-const tabItems: TabItem[] = [
-  {
-    label: "Room",
-    value: "room",
-    icon: <House {...iconProps} />,
-  },
-  {
-    label: "Local Participant",
-    value: "local-participant",
-    icon: <UserRound {...iconProps} />,
-  },
-  {
-    label: "Remote Participants",
-    value: "remote-participants",
-    icon: <UsersRound {...iconProps} />,
-    indicator: <RemoteParticipantsIndicator />,
-  },
-  {
-    label: "Videos",
-    value: "videos",
-    icon: <Video {...iconProps} />,
-  },
-];
 
 const LivekitStateContent = ({
   value,
@@ -82,11 +32,16 @@ const LivekitStateContent = ({
   );
 };
 
-export const LivekitStateTabs = ({ defaultValue = "room", className }: LivekitStateTabsProps) => {
+export const LivekitStateTabs = ({ className }: LivekitStateTabsProps) => {
   const { room, localParticipant } = useLivekitState();
+  const { selectedTab, setSelectedTab } = useTabs();
 
   return (
-    <Tabs defaultValue={defaultValue} className={cn("h-full flex flex-col", className)}>
+    <Tabs
+      defaultValue={selectedTab}
+      className={cn("h-full flex flex-col", className)}
+      onValueChange={(value) => setSelectedTab(value as TabValue)}
+    >
       <ScrollArea>
         <TabsList className="h-auto gap-2 rounded-none border-b border-border bg-transparent px-0 text-foreground w-full flex">
           {tabItems.map((item) => (
