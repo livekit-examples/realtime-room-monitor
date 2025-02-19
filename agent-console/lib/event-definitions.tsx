@@ -1,4 +1,4 @@
-import { ConnectionQuality, DataPacket_Kind } from "livekit-client";
+import { ConnectionQuality, DataPacket_Kind, isLocalParticipant } from "livekit-client";
 import { defineEvent, renderJson } from "./event-registry";
 import { EventLevel, EventSource, isAgent, RoomEventCallbackData } from "./event-types";
 
@@ -94,7 +94,7 @@ export const roomEventRegistry = {
   }),
   trackUnsubscribed: defineEvent<RoomEventReturn<"trackUnsubscribed">>({
     level: EventLevel.Info,
-    source: EventSource.Client,
+    source: EventSource.Server,
     message: ({ track, participant }) =>
       `Unsubscribed from ${track.source} track by ${participant.identity}`,
     render: ({ track, publication, participant }) =>
@@ -102,16 +102,22 @@ export const roomEventRegistry = {
   }),
   trackMuted: defineEvent<RoomEventReturn<"trackMuted">>({
     level: EventLevel.Warn,
-    source: EventSource.Client,
+    source: ({ participant }) =>
+      isLocalParticipant(participant) ? EventSource.Client : EventSource.Server,
     message: ({ publication, participant }) =>
-      `${participant.identity} muted ${publication.kind} track`,
+      isAgent(participant)
+        ? `Agent ${participant.identity} muted ${publication.kind} track`
+        : `Participant ${participant.identity} muted ${publication.kind} track`,
     render: ({ publication, participant }) => renderJson({ publication, participant }),
   }),
   trackUnmuted: defineEvent<RoomEventReturn<"trackUnmuted">>({
     level: EventLevel.Info,
-    source: EventSource.Client,
+    source: ({ participant }) =>
+      isLocalParticipant(participant) ? EventSource.Client : EventSource.Server,
     message: ({ publication, participant }) =>
-      `${participant.identity} unmuted ${publication.kind} track`,
+      isAgent(participant)
+        ? `Agent ${participant.identity} unmuted ${publication.kind} track`
+        : `Participant ${participant.identity} unmuted ${publication.kind} track`,
     render: ({ publication, participant }) => renderJson({ publication, participant }),
   }),
   localTrackPublished: defineEvent<RoomEventReturn<"localTrackPublished">>({
@@ -121,15 +127,110 @@ export const roomEventRegistry = {
       `Published local ${publication.kind} track from ${publication.source}`,
     render: ({ publication, participant }) => renderJson({ publication, participant }),
   }),
+  localTrackUnpublished: defineEvent<RoomEventReturn<"localTrackUnpublished">>({
+    level: EventLevel.Info,
+    source: EventSource.Client,
+    message: ({ publication }) =>
+      `Unpublished local ${publication.kind} track from ${publication.source}`,
+    render: ({ publication, participant }) => renderJson({ publication, participant }),
+  }),
+  localAudioSilenceDetected: defineEvent<RoomEventReturn<"localAudioSilenceDetected">>({
+    level: EventLevel.Warn,
+    source: EventSource.Client,
+    message: ({ publication }) =>
+      `Local audio silence detected for ${publication.kind} track from ${publication.source}`,
+    render: ({ publication }) => renderJson({ publication }),
+  }),
+  participantMetadataChanged: defineEvent<RoomEventReturn<"participantMetadataChanged">>({
+    level: EventLevel.Info,
+    source: EventSource.System,
+    message: ({ metadata, participant }) =>
+      `${
+        isLocalParticipant(participant)
+          ? "Your"
+          : isAgent(participant)
+          ? `An agent "${participant.identity}"`
+          : `A participant "${participant.identity}"`
+      } metadata has changed to ${metadata}`,
+    render: ({ metadata, participant }) => renderJson({ metadata, participant }),
+  }),
+  participantNameChanged: defineEvent<RoomEventReturn<"participantNameChanged">>({
+    level: EventLevel.Info,
+    source: EventSource.System,
+    message: ({ name, participant }) =>
+      `${
+        isLocalParticipant(participant)
+          ? "Your"
+          : isAgent(participant)
+          ? `An agent "${participant.identity}"`
+          : `A participant "${participant.identity}"`
+      } name has changed to ${name}`,
+    render: ({ name, participant }) => renderJson({ name, participant }),
+  }),
+  participantPermissionsChanged: defineEvent<RoomEventReturn<"participantPermissionsChanged">>({
+    level: EventLevel.Info,
+    source: EventSource.System,
+    message: ({ prevPermissions, participant }) =>
+      `${
+        isLocalParticipant(participant)
+          ? "Your"
+          : isAgent(participant)
+          ? `An agent "${participant.identity}"`
+          : `A participant "${participant.identity}"`
+      } permissions have changed from ${prevPermissions} to ${participant.permissions}`,
+    render: ({ prevPermissions, participant }) => renderJson({ prevPermissions, participant }),
+  }),
+  participantAttributesChanged: defineEvent<RoomEventReturn<"participantAttributesChanged">>({
+    level: EventLevel.Info,
+    source: EventSource.System,
+    message: ({ changedAttributes, participant }) =>
+      `${
+        isLocalParticipant(participant)
+          ? "Your"
+          : isAgent(participant)
+          ? `An agent "${participant.identity}"`
+          : `A participant "${participant.identity}"`
+      } attributes have changed to ${changedAttributes}`,
+    render: ({ changedAttributes, participant }) => renderJson({ changedAttributes, participant }),
+  }),
+  activeSpeakersChanged: defineEvent<RoomEventReturn<"activeSpeakersChanged">>({
+    level: EventLevel.Info,
+    source: EventSource.System,
+    message: ({ speakers }) =>
+      `Active speakers have changed to ${speakers.map((s) => s.identity).join(", ")}`,
+    render: ({ speakers }) => renderJson({ speakers }),
+  }),
+  roomMetadataChanged: defineEvent<RoomEventReturn<"roomMetadataChanged">>({
+    level: EventLevel.Info,
+    source: EventSource.System,
+    message: ({ metadata }) => `Room metadata has changed to ${metadata}`,
+    render: ({ metadata }) => renderJson({ metadata }),
+  }),
   dataReceived: defineEvent<RoomEventReturn<"dataReceived">>({
     level: EventLevel.Info,
-    source: EventSource.Server,
+    source: EventSource.Client,
     message: ({ payload, kind, participant, topic }) =>
       `Received data packet (${DataPacket_Kind[kind!]}, ${payload.length} bytes) from ${
         participant?.identity
       } on topic ${topic}`,
     render: ({ payload, participant, kind, topic }) =>
       renderJson({ payload, participant, kind, topic }),
+  }),
+  sipDTMFReceived: defineEvent<RoomEventReturn<"sipDTMFReceived">>({
+    level: EventLevel.Info,
+    source: EventSource.Client,
+    message: ({ dtmf, participant }) => `Received DTMF from ${participant?.identity}: ${dtmf}`,
+    render: ({ dtmf, participant }) => renderJson({ dtmf, participant }),
+  }),
+  transcriptionReceived: defineEvent<RoomEventReturn<"transcriptionReceived">>({
+    level: EventLevel.Info,
+    source: EventSource.Server,
+    message: ({ transcription, participant }) =>
+      `Transcription received from ${participant?.identity}: ${transcription
+        .map((t) => t.text)
+        .join("")}`,
+    render: ({ transcription, participant, publication }) =>
+      renderJson({ transcription, participant, publication }),
   }),
   chatMessage: defineEvent<RoomEventReturn<"chatMessage">>({
     level: EventLevel.Info,
@@ -143,6 +244,98 @@ export const roomEventRegistry = {
     source: EventSource.Server,
     message: ({ quality, participant }) => `${participant.identity} connection quality: ${quality}`,
     render: ({ quality, participant }) => renderJson({ quality, participant }),
+  }),
+  mediaDevicesError: defineEvent<RoomEventReturn<"mediaDevicesError">>({
+    level: EventLevel.Error,
+    source: EventSource.Client,
+    message: ({ error }) => `Media devices error: ${error}`,
+    render: ({ error }) => renderJson({ error }),
+  }),
+  trackStreamStateChanged: defineEvent<RoomEventReturn<"trackStreamStateChanged">>({
+    level: EventLevel.Info,
+    source: EventSource.System,
+    message: ({ publication, participant, streamState }) =>
+      `${participant.identity} ${publication.kind} track state: ${streamState}`,
+    render: ({ publication, participant, streamState }) =>
+      renderJson({ publication, participant, streamState }),
+  }),
+  trackSubscriptionPermissionChanged: defineEvent<
+    RoomEventReturn<"trackSubscriptionPermissionChanged">
+  >({
+    level: EventLevel.Info,
+    source: EventSource.Server,
+    message: ({ publication, participant, status }) =>
+      `${participant.identity} ${publication.kind} track subscription permission: ${status}`,
+    render: ({ publication, participant, status }) =>
+      renderJson({ publication, participant, status }),
+  }),
+  trackSubscriptionStatusChanged: defineEvent<RoomEventReturn<"trackSubscriptionStatusChanged">>({
+    level: EventLevel.Info,
+    source: EventSource.Server,
+    message: ({ publication, participant, status }) =>
+      `${participant.identity} ${publication.kind} track subscription status: ${status}`,
+    render: ({ publication, participant, status }) =>
+      renderJson({ publication, participant, status }),
+  }),
+  audioPlaybackChanged: defineEvent<RoomEventReturn<"audioPlaybackChanged">>({
+    level: EventLevel.Info,
+    source: EventSource.Client,
+    message: ({ playing }) => `Audio playback: ${playing ? "playing" : "paused"}`,
+    render: ({ playing }) => renderJson({ playing }),
+  }),
+  videoPlaybackChanged: defineEvent<RoomEventReturn<"videoPlaybackChanged">>({
+    level: EventLevel.Info,
+    source: EventSource.Client,
+    message: ({ playing }) => `Video playback: ${playing ? "playing" : "paused"}`,
+    render: ({ playing }) => renderJson({ playing }),
+  }),
+  recordingStatusChanged: defineEvent<RoomEventReturn<"recordingStatusChanged">>({
+    level: EventLevel.Info,
+    source: EventSource.Client,
+    message: ({ recording }) => `Recording status: ${recording ? "recording" : "not recording"}`,
+    render: ({ recording }) => renderJson({ recording }),
+  }),
+  participantEncryptionStatusChanged: defineEvent<
+    RoomEventReturn<"participantEncryptionStatusChanged">
+  >({
+    level: EventLevel.Info,
+    source: EventSource.Server,
+    message: ({ encrypted, participant }) =>
+      `${participant?.identity} encryption status: ${encrypted ? "encrypted" : "not encrypted"}`,
+    render: ({ encrypted, participant }) => renderJson({ encrypted, participant }),
+  }),
+  encryptionError: defineEvent<RoomEventReturn<"encryptionError">>({
+    level: EventLevel.Error,
+    source: EventSource.Server,
+    message: ({ error }) => `Encryption error: ${error}`,
+    render: ({ error }) => renderJson({ error }),
+  }),
+  dcBufferStatusChanged: defineEvent<RoomEventReturn<"dcBufferStatusChanged">>({
+    level: EventLevel.Info,
+    source: EventSource.Server,
+    message: ({ isLow, kind }) =>
+      `DC buffer status: ${isLow ? "low" : "high"} for ${DataPacket_Kind[kind!]}`,
+    render: ({ isLow, kind }) => renderJson({ isLow, kind }),
+  }),
+  activeDeviceChanged: defineEvent<RoomEventReturn<"activeDeviceChanged">>({
+    level: EventLevel.Info,
+    source: EventSource.Client,
+    message: ({ deviceType, deviceId }) => `Active device changed to ${deviceType}: ${deviceId}`,
+    render: ({ deviceType, deviceId }) => renderJson({ deviceType, deviceId }),
+  }),
+  localTrackSubscribed: defineEvent<RoomEventReturn<"localTrackSubscribed">>({
+    level: EventLevel.Info,
+    source: EventSource.Client,
+    message: ({ publication, participant }) =>
+      `${participant?.identity} subscribed to local ${publication.kind} track`,
+    render: ({ publication, participant }) => renderJson({ publication, participant }),
+  }),
+  metricsReceived: defineEvent<RoomEventReturn<"metricsReceived">>({
+    level: EventLevel.Info,
+    source: EventSource.Server,
+    message: ({ metrics, participant }) =>
+      `Metrics received from ${participant?.identity}: ${metrics}`,
+    render: ({ metrics, participant }) => renderJson({ metrics, participant }),
   }),
 };
 
