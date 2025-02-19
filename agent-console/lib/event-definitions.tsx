@@ -193,13 +193,6 @@ export const roomEventRegistry = {
       } attributes have changed to ${changedAttributes}`,
     render: ({ changedAttributes, participant }) => renderJson({ changedAttributes, participant }),
   }),
-  activeSpeakersChanged: defineEvent<RoomEventReturn<"activeSpeakersChanged">>({
-    level: EventLevel.Info,
-    source: EventSource.System,
-    message: ({ speakers }) =>
-      `Active speakers have changed to ${speakers.map((s) => s.identity).join(", ")}`,
-    render: ({ speakers }) => renderJson({ speakers }),
-  }),
   roomMetadataChanged: defineEvent<RoomEventReturn<"roomMetadataChanged">>({
     level: EventLevel.Info,
     source: EventSource.System,
@@ -320,7 +313,7 @@ export const roomEventRegistry = {
   activeDeviceChanged: defineEvent<RoomEventReturn<"activeDeviceChanged">>({
     level: EventLevel.Info,
     source: EventSource.Client,
-    message: ({ deviceType, deviceId }) => `Active device changed to ${deviceType}: ${deviceId}`,
+    message: ({ deviceType }) => `Active device changed to ${deviceType}`,
     render: ({ deviceType, deviceId }) => renderJson({ deviceType, deviceId }),
   }),
   localTrackSubscribed: defineEvent<RoomEventReturn<"localTrackSubscribed">>({
