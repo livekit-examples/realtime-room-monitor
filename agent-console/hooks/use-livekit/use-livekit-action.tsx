@@ -53,7 +53,7 @@ const handleSendData = async (req: SendDataRequest) => {
 };
 
 const handleUpdateRoomMetadata = async (req: UpdateRoomMetadataRequest) => {
-  const url = new URL("/api/room/update-room-metadata", window.location.origin);
+  const url = new URL("/api/room/update-metadata", window.location.origin);
   const response = await fetch(url.toString(), {
     method: "POST",
     body: JSON.stringify(req),

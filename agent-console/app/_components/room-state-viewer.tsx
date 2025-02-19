@@ -23,7 +23,6 @@ export const RoomStateViewer = ({
   connectionDetails,
   serverInfo,
 }: LivekitRoomState) => {
-  const parsedMetadata = safeParseJSON(metadata);
   const serverDetails = {
     protocol: serverInfo?.protocol,
     region: serverInfo?.region,
@@ -41,7 +40,7 @@ export const RoomStateViewer = ({
 
       <CollapsibleSection title="Connection Details">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <JsonPreview title="Room Metadata" data={parsedMetadata} />
+          <JsonPreview title="Room Metadata" data={metadata} />
           <JsonPreview title="Connection Configuration" data={connectionDetails} />
         </div>
       </CollapsibleSection>
@@ -56,12 +55,4 @@ export const RoomStateViewer = ({
       </CollapsibleSection>
     </div>
   );
-};
-
-const safeParseJSON = (data?: string): object | undefined => {
-  try {
-    return data ? JSON.parse(data) : undefined;
-  } catch (error) {
-    return { error: `Invalid JSON format ${error}`, rawData: data };
-  }
 };
