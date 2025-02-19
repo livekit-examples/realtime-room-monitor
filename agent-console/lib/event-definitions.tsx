@@ -190,7 +190,7 @@ export const roomEventRegistry = {
           : isAgent(participant)
           ? `An agent "${participant.identity}"`
           : `A participant "${participant.identity}"`
-      } attributes have changed to ${changedAttributes}`,
+      } attributes have changed to ${JSON.stringify(changedAttributes)}`,
     render: ({ changedAttributes, participant }) => renderJson({ changedAttributes, participant }),
   }),
   roomMetadataChanged: defineEvent<RoomEventReturn<"roomMetadataChanged">>({
