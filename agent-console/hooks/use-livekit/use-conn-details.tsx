@@ -1,4 +1,4 @@
-import { ConnectionDetails } from "@/app/api/connection-details/route";
+import { ConnectionDetails } from "@/app/api/token/route";
 import { create } from "zustand";
 
 export const useConnectionDetails = create<{

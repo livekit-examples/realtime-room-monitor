@@ -18,9 +18,7 @@ export const ConnectionButton: React.FC<React.HTMLAttributes<HTMLButtonElement>>
   const {
     room: { connectionState },
   } = useLivekitState();
-  const {
-    room: { connect, disconnect },
-  } = useLivekitAction();
+  const { connect, disconnect } = useLivekitAction();
 
   const getButtonContent = () => {
     switch (connectionState) {
