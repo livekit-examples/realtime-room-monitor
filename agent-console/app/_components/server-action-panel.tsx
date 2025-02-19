@@ -108,44 +108,17 @@ export const ServerActionPanel: React.FC<React.HTMLAttributes<HTMLDivElement>> =
   const Panel = useMemo(() => tabValueToPanelMap[selectedTab], [selectedTab]);
 
   return (
-    <div className={cn("h-full flex flex-col bg-background p-6 space-y-6", className)} {...rest}>
-      <div className="space-y-1">
-        <h2 className="text-xl font-bold tracking-tight">Room Administration Console</h2>
-        <p className="text-sm text-muted-foreground">
-          Manage participants, configure room settings, and monitor real-time metrics
-        </p>
-      </div>
-
-      <div className="flex-1 overflow-y-auto space-y-8">
-        <div className="rounded-xl border bg-card p-6 shadow-sm">
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold leading-none tracking-tight">
-              {selectedTabLabels[selectedTab]}
-            </h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {selectedTabDescriptions[selectedTab]}
-            </p>
-          </div>
-          <Panel />
+    <div className={cn("h-full flex flex-col bg-background p-6", className)} {...rest}>
+      <div className="rounded-xl border bg-card p-6 shadow-sm">
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold leading-none tracking-tight">
+            {selectedTabLabels[selectedTab]}
+          </h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {selectedTabDescriptions[selectedTab]}
+          </p>
         </div>
-
-        <div className="rounded-xl border bg-card p-6 space-y-4">
-          <h3 className="text-lg font-semibold">System Actions</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Button variant="outline" className="h-24 flex flex-col gap-2">
-              <span className="text-base">🔄 Refresh State</span>
-              <span className="text-xs text-muted-foreground font-normal">
-                Force update all room metrics
-              </span>
-            </Button>
-            <Button variant="outline" className="h-24 flex flex-col gap-2">
-              <span className="text-base">🚫 Disconnect All</span>
-              <span className="text-xs text-muted-foreground font-normal">
-                Remove all participants
-              </span>
-            </Button>
-          </div>
-        </div>
+        <Panel />
       </div>
     </div>
   );
