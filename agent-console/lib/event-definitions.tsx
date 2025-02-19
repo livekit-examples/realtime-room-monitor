@@ -151,7 +151,7 @@ export const roomEventRegistry = {
           : isAgent(participant)
           ? `An agent "${participant.identity}"`
           : `A participant "${participant.identity}"`
-      } metadata has changed to ${metadata}`,
+      } metadata has changed from "${metadata}"`,
     render: ({ metadata, participant }) => renderJson({ metadata, participant }),
   }),
   participantNameChanged: defineEvent<RoomEventReturn<"participantNameChanged">>({
@@ -170,14 +170,14 @@ export const roomEventRegistry = {
   participantPermissionsChanged: defineEvent<RoomEventReturn<"participantPermissionsChanged">>({
     level: EventLevel.Info,
     source: EventSource.System,
-    message: ({ prevPermissions, participant }) =>
+    message: ({ participant }) =>
       `${
         isLocalParticipant(participant)
           ? "Your"
           : isAgent(participant)
           ? `An agent "${participant.identity}"`
           : `A participant "${participant.identity}"`
-      } permissions have changed from ${prevPermissions} to ${participant.permissions}`,
+      } permissions have changed`,
     render: ({ prevPermissions, participant }) => renderJson({ prevPermissions, participant }),
   }),
   participantAttributesChanged: defineEvent<RoomEventReturn<"participantAttributesChanged">>({

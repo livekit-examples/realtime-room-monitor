@@ -1,4 +1,5 @@
 import { ActionCard } from "@/components/action-card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -45,7 +46,85 @@ const RoomActionPanel = () => {
 };
 
 const ParticipantActionPanel = () => {
-  return <div>ParticipantActionPanel</div>;
+  const { localParticipant, room } = useLivekitState();
+  const { updateParticipant } = useLivekitAction();
+  const [metadataInput, setMetadataInput] = useState("");
+  const [permissions, setPermissions] = useState({
+    canPublish: true,
+    canSubscribe: true,
+    canPublishData: true,
+  });
+
+  return (
+    <div className="space-y-6 p-4">
+      <ActionCard
+        title="Update Local Participant"
+        description="Modify participant permissions and metadata"
+        action={async () => {
+          if (!localParticipant) throw new Error("No participant selected");
+          return updateParticipant({
+            roomName: room.name,
+            identity: localParticipant.identity as string,
+            options: {
+              metadata: metadataInput,
+              permission: permissions,
+            },
+          });
+        }}
+        disabled={!metadataInput}
+      >
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <Label>Participant Identity</Label>
+            <Input
+              value={localParticipant.identity as string}
+              disabled
+              placeholder="Select participant first"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Permissions</Label>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="canPublish"
+                  checked={permissions.canPublish}
+                  onCheckedChange={(c) => setPermissions((p) => ({ ...p, canPublish: !!c }))}
+                />
+                <Label htmlFor="canPublish">Can Publish</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="canSubscribe"
+                  checked={permissions.canSubscribe}
+                  onCheckedChange={(c) => setPermissions((p) => ({ ...p, canSubscribe: !!c }))}
+                />
+                <Label htmlFor="canSubscribe">Can Subscribe</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="canPublishData"
+                  checked={permissions.canPublishData}
+                  onCheckedChange={(c) => setPermissions((p) => ({ ...p, canPublishData: !!c }))}
+                />
+                <Label htmlFor="canPublishData">Can Send Data</Label>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Metadata</Label>
+            <Input
+              value={metadataInput}
+              onChange={(e) => setMetadataInput(e.target.value)}
+              placeholder="Enter participant metadata"
+            />
+          </div>
+        </div>
+      </ActionCard>
+    </div>
+  );
 };
 
 const RemoteParticipantActionPanel = () => {

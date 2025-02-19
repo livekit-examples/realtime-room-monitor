@@ -25,7 +25,7 @@ const LivekitStateContent = ({
     <TabsContent value={value} className="flex-1 relative p-0 m-0">
       <div className="absolute inset-0">
         <ScrollArea className="h-full">
-          <div className="py-4 flex flex-col gap-4">{children}</div>
+          <div className="py-4 flex flex-col gap-4 px-4">{children}</div>
         </ScrollArea>
       </div>
     </TabsContent>
