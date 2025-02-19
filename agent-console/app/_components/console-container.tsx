@@ -9,7 +9,7 @@ import { getEventLevel, getEventMessage, useLogger } from "@/hooks/use-logger";
 import { cn } from "@/lib/utils";
 import { RoomAudioRenderer, useConnectionState } from "@livekit/components-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { AlertCircle, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { ConnectionButton } from "./connection-button";
 import { ControlBar } from "./control-bar";
@@ -62,7 +62,7 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel className="py-4 min-w-[450px] max-w-[876px] flex flex-col">
             {/* Actions */}
-            <div className="mb-4 px-4 flex items-center justify-between gap-2">
+            <div className="px-4 flex items-center justify-between gap-2 pb-4 border-b">
               <LevelFilter
                 displayInfo={displayInfo}
                 displayWarn={displayWarn}
@@ -95,11 +95,28 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
             {/* Logs */}
             <div className="flex-1 relative">
               <div className="absolute inset-0">
-                <ScrollArea className="h-full">
-                  {filteredLogs.map((logEntry, index) => (
-                    <LogItem key={index} logEntry={logEntry} expandAll={expandAll} />
-                  ))}
-                </ScrollArea>
+                {filteredLogs.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-center p-8">
+                    <div className="text-muted-foreground text-sm max-w-[500px] space-y-3 border bg-muted rounded-md p-8">
+                      <div className="space-y-2">
+                        <AlertCircle className="h-6 w-6 mx-auto text-muted-foreground/50" />
+                        <p className="font-medium">No matching logs found</p>
+                      </div>
+                      <p className="mt-2 opacity-75">
+                        Try adjusting your search query or level filters
+                      </p>
+                      <p className="mt-1 opacity-75">
+                        Interact with the room to see real-time events
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <ScrollArea className="h-full flex flex-col items-center justify-center">
+                    {filteredLogs.map((logEntry, index) => (
+                      <LogItem key={index} logEntry={logEntry} expandAll={expandAll} />
+                    ))}
+                  </ScrollArea>
+                )}
               </div>
             </div>
           </ResizablePanel>
