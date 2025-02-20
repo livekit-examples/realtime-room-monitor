@@ -1,11 +1,10 @@
-import { getLiveKitCredentials } from "@/lib/livekit-utils";
+import { getLiveKitCredentialsFromRequest } from "@/lib/livekit-utils";
 import { RoomServiceClient } from "livekit-server-sdk";
 import { NextResponse } from "next/server";
 
-const { API_KEY, API_SECRET, LIVEKIT_URL } = getLiveKitCredentials();
-
 export async function POST(request: Request) {
   try {
+    const { API_KEY, API_SECRET, LIVEKIT_URL } = await getLiveKitCredentialsFromRequest(request);
     const { roomName, metadata }: { roomName: string; metadata: string } = await request.json();
     if (!roomName || typeof metadata !== "string") {
       return new NextResponse("Invalid request body", { status: 400 });

@@ -1,13 +1,13 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-type Credentials = {
+export type Credentials = {
   LIVEKIT_URL?: string;
   LIVEKIT_API_KEY?: string;
   LIVEKIT_API_SECRET?: string;
 };
 
-type CredentialsState = {
+export type CredentialsState = {
   credentials: Credentials;
   setCredentials: (credentials: Partial<Credentials>) => void;
   isConfigured: () => boolean;

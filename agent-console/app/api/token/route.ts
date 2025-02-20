@@ -1,8 +1,6 @@
-import { getLiveKitCredentials } from "@/lib/livekit-utils";
+import { getLiveKitCredentialsFromRequest } from "@/lib/livekit-utils";
 import { AccessToken, AccessTokenOptions, VideoGrant } from "livekit-server-sdk";
 import { NextResponse } from "next/server";
-
-const { API_KEY, API_SECRET, LIVEKIT_URL } = getLiveKitCredentials();
 
 export const revalidate = 0;
 
@@ -15,6 +13,7 @@ export type ConnectionDetails = {
 
 export async function GET(request: Request) {
   try {
+    const { API_KEY, API_SECRET, LIVEKIT_URL } = await getLiveKitCredentialsFromRequest(request);
     const { searchParams } = new URL(request.url);
     const roomName = searchParams.get("roomName");
     const userId = searchParams.get("userId");
@@ -24,10 +23,15 @@ export async function GET(request: Request) {
     }
 
     // Generate participant token with provided values
-    const participantToken = await createParticipantToken({ identity: userId }, roomName);
+    const participantToken = await createParticipantToken(
+      { identity: userId },
+      roomName,
+      API_KEY,
+      API_SECRET
+    );
 
     const data: ConnectionDetails = {
-      serverUrl: LIVEKIT_URL!,
+      serverUrl: LIVEKIT_URL,
       roomName,
       participantToken,
       participantName: userId,
@@ -42,10 +46,15 @@ export async function GET(request: Request) {
   }
 }
 
-function createParticipantToken(userInfo: AccessTokenOptions, roomName: string) {
-  const at = new AccessToken(API_KEY, API_SECRET, {
+function createParticipantToken(
+  userInfo: AccessTokenOptions,
+  roomName: string,
+  apiKey: string,
+  apiSecret: string
+) {
+  const at = new AccessToken(apiKey, apiSecret, {
     ...userInfo,
-    ttl: "15m",
+    ttl: "60m",
   });
 
   const grant: VideoGrant = {

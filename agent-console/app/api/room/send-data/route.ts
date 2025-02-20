@@ -1,10 +1,10 @@
-import { getLiveKitCredentials } from "@/lib/livekit-utils";
+import { getLiveKitCredentialsFromRequest } from "@/lib/livekit-utils";
 import { RoomServiceClient } from "livekit-server-sdk";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {
-    const { API_KEY, API_SECRET, LIVEKIT_URL } = getLiveKitCredentials();
+    const { API_KEY, API_SECRET, LIVEKIT_URL } = await getLiveKitCredentialsFromRequest(request);
     const { roomName, data, kind, options } = await request.json();
 
     if (!roomName || !data || !kind) {
