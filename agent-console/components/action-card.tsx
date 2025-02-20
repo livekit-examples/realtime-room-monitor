@@ -46,7 +46,7 @@ export const ActionCard = ({
   }, [handleActionImpl]);
 
   return (
-    <div className={cn("space-y-6 p-4 border rounded-lg bg-card shadow-sm", className)}>
+    <div className={cn("space-y-6 p-4 border rounded-lg bg-card shadow-md", className)}>
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">{title}</h3>
         <p className="text-sm text-muted-foreground">{description}</p>

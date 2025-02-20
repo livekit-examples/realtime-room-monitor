@@ -5,10 +5,7 @@ import { useMemo } from "react";
 import { ParticipantActionPanel } from "./participant-action-panel";
 import { RemoteParticipantsActionPanel } from "./remote-participants-action-panel";
 import { RoomActionPanel } from "./room-action-panel";
-
-const VideoTrackActionPanel = () => {
-  return <div>VideoTrackActionPanel</div>;
-};
+import { VideoTrackActionPanel } from "./video-track-action-panel";
 
 const tabValueToPanelMap: Record<TabValue, React.FC> = {
   room: RoomActionPanel,
