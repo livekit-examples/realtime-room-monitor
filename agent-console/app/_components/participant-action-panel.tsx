@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useLivekitAction, useLivekitParticipantState, useLivekitState } from "@/hooks/use-livekit";
 import { useLocalParticipant } from "@livekit/components-react";
-import { Participant } from "livekit-client";
+import { isLocalParticipant, Participant } from "livekit-client";
 import { ParticipantPermission } from "livekit-server-sdk";
 import { useEffect, useMemo, useState } from "react";
 
@@ -35,8 +35,10 @@ export const ParticipantActionPanelInner = ({ participant }: { participant: Part
     attributes: initialAttributes,
   } = useLivekitParticipantState(participant);
 
+  const isRemoteParticipant = useMemo(() => !isLocalParticipant(participant), [participant]);
+
   const { room } = useLivekitState();
-  const { updateParticipant } = useLivekitAction();
+  const { updateParticipant, removeParticipant } = useLivekitAction();
 
   // Name Update
   const [nameInput, setNameInput] = useState(name || "");
@@ -289,6 +291,26 @@ export const ParticipantActionPanelInner = ({ participant }: { participant: Part
           </div>
         </div>
       </ActionCard>
+
+      {isRemoteParticipant && (
+        <ActionCard
+          title="Remove Participant"
+          description="Remove participant from the room"
+          action={async () => {
+            if (!identity) throw new Error("Participant not found");
+
+            return removeParticipant({
+              roomName: room.name,
+              identity: identity as string,
+            });
+          }}
+        >
+          <p className="text-sm text-muted-foreground">
+            You are about to remove participant <span className="font-medium">{identity}</span> from
+            the room.
+          </p>
+        </ActionCard>
+      )}
     </div>
   );
 };
