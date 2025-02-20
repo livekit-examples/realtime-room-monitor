@@ -19,7 +19,6 @@ export const useLivekitAction = () => {
 
   const handleConnect = useCallback(async () => {
     const url = new URL("/api/token", window.location.origin);
-    console.log("credentials", { roomName, userId, ...credentials });
     const response = await fetch(url.toString(), {
       method: "POST",
       body: JSON.stringify({ roomName, userId, ...credentials }),

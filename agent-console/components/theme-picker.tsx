@@ -15,7 +15,6 @@ export function ThemePicker() {
   const [mounted, setMounted] = useState(false);
   const id = useId();
   const { theme, setTheme } = useTheme();
-  console.log(theme);
 
   useEffect(() => {
     setMounted(true);
