@@ -1,11 +1,13 @@
 "use client";
 
+import { CredentialSettings } from "@/components/credential-settings";
 import LK from "@/components/lk";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useCredentials } from "@/hooks/use-credentials";
 import { useRoomInfo } from "@/hooks/use-room-info";
 import { Github } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -13,8 +15,9 @@ import { useRouter } from "next/navigation";
 export default function Page() {
   const router = useRouter();
   const { roomName, userId, setRoomName, setUserId } = useRoomInfo();
+  const { isConfigured } = useCredentials();
 
-  const handleJoinRoom = async (e: React.FormEvent) => {
+  const handleJoinRoom = async (e) => {
     e.preventDefault();
     try {
       router.push(
@@ -38,7 +41,8 @@ export default function Page() {
         dark:opacity-30"
       />
 
-      <div className="absolute top-4 right-4">
+      <div className="absolute top-4 right-4 flex gap-2">
+        <CredentialSettings />
         <ThemeToggle />
       </div>
 
@@ -56,7 +60,7 @@ export default function Page() {
         </div>
 
         <Card className="p-8 space-y-6 shadow-lg">
-          <form onSubmit={handleJoinRoom} className="space-y-6">
+          <div className="space-y-6">
             <div className="space-y-2">
               <Label className="text-base">Room Configuration</Label>
               <p className="text-sm text-muted-foreground">
@@ -94,10 +98,22 @@ export default function Page() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full" size="lg">
-              Start Observing
+            <Button
+              type="submit"
+              className="w-full"
+              size="lg"
+              disabled={!isConfigured()}
+              onClick={(e) => handleJoinRoom(e)}
+            >
+              {isConfigured() ? "Start Observing" : "Configure Credentials First"}
             </Button>
-          </form>
+
+            {!isConfigured() && (
+              <div className="text-center text-sm text-red-500">
+                Please configure LiveKit credentials in settings at the top right corner
+              </div>
+            )}
+          </div>
 
           <div className="pt-4 border-t">
             <a

@@ -1,5 +1,6 @@
 "use client";
 
+import { CredentialSettings } from "@/components/credential-settings";
 import LK from "@/components/lk";
 import { ThemeSwitch } from "@/components/theme-switch";
 import { useConnectionDetails } from "@/hooks/use-livekit";
@@ -47,7 +48,10 @@ export default function Page() {
         <LivekitEventInstrumentor>
           <div className="flex flex-row justify-between p-3 px-2 pb-1">
             <LK />
-            <ThemeSwitch />
+            <div className="flex flex-row gap-2">
+              <CredentialSettings />
+              <ThemeSwitch />
+            </div>
           </div>
           <div className="flex-1 p-2">
             <ConsoleContainer className="h-full shadow-sm rounded-md bg-background" />
