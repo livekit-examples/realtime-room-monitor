@@ -1,8 +1,10 @@
 import { ActionCard } from "@/components/action-card";
+import { JsonEditor } from "@/components/json-editor";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
 import { useLivekitAction, useLivekitState } from "@/hooks/use-livekit";
 import { TabValue, useTabs } from "@/hooks/use-tabs";
 import { cn } from "@/lib/utils";
@@ -48,78 +50,160 @@ const RoomActionPanel = () => {
 const ParticipantActionPanel = () => {
   const { localParticipant, room } = useLivekitState();
   const { updateParticipant } = useLivekitAction();
-  const [metadataInput, setMetadataInput] = useState("");
+
+  // Name Update
+  const [nameInput, setNameInput] = useState(localParticipant?.name || "");
+
+  // Attributes Update
+  const [attributes, setAttributes] = useState<[string, string][]>([]);
+  const [newAttributeKey, setNewAttributeKey] = useState("");
+  const [newAttributeValue, setNewAttributeValue] = useState("");
+
+  // Metadata Update
+  const [metadataInput, setMetadataInput] = useState(localParticipant?.metadata || "");
+
+  // Permissions Update
   const [permissions, setPermissions] = useState({
-    canPublish: true,
-    canSubscribe: true,
-    canPublishData: true,
+    canSubscribe: localParticipant?.permissions?.canSubscribe ?? true,
+    canPublish: localParticipant?.permissions?.canPublish ?? true,
+    canPublishData: localParticipant?.permissions?.canPublishData ?? true,
+    canUpdateMetadata: localParticipant?.permissions?.canUpdateMetadata ?? false,
+    hidden: localParticipant?.permissions?.hidden ?? false,
   });
 
   return (
     <div className="space-y-6 p-4">
+      {/* Name Update Card */}
       <ActionCard
-        title="Update Local Participant"
-        description="Modify participant permissions and metadata"
+        title="Update Participant Identity"
+        description="Change the displayed name for this participant"
         action={async () => {
-          if (!localParticipant) throw new Error("No participant selected");
+          if (!localParticipant) throw new Error("Participant not found");
           return updateParticipant({
             roomName: room.name,
             identity: localParticipant.identity as string,
-            options: {
-              metadata: metadataInput,
-              permission: permissions,
-            },
+            options: { name: nameInput },
           });
         }}
-        disabled={!metadataInput}
+        disabled={!nameInput || nameInput === localParticipant?.name}
       >
-        <div className="space-y-6">
-          <div className="space-y-2">
-            <Label>Participant Identity</Label>
-            <Input
-              value={localParticipant.identity as string}
-              disabled
-              placeholder="Select participant first"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Permissions</Label>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="canPublish"
-                  checked={permissions.canPublish}
-                  onCheckedChange={(c) => setPermissions((p) => ({ ...p, canPublish: !!c }))}
-                />
-                <Label htmlFor="canPublish">Can Publish</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="canSubscribe"
-                  checked={permissions.canSubscribe}
-                  onCheckedChange={(c) => setPermissions((p) => ({ ...p, canSubscribe: !!c }))}
-                />
-                <Label htmlFor="canSubscribe">Can Subscribe</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="canPublishData"
-                  checked={permissions.canPublishData}
-                  onCheckedChange={(c) => setPermissions((p) => ({ ...p, canPublishData: !!c }))}
-                />
-                <Label htmlFor="canPublishData">Can Send Data</Label>
-              </div>
+        <div className="space-y-4">
+          <Input
+            value={nameInput}
+            onChange={(e) => setNameInput(e.target.value)}
+            placeholder="Enter new display name"
+          />
+          {localParticipant?.name && (
+            <div className="text-sm text-muted-foreground">
+              Current name: {localParticipant.name}
             </div>
-          </div>
+          )}
+        </div>
+      </ActionCard>
 
-          <div className="space-y-2">
-            <Label>Metadata</Label>
-            <Input
-              value={metadataInput}
-              onChange={(e) => setMetadataInput(e.target.value)}
-              placeholder="Enter participant metadata"
+      {/* Attributes Update Card */}
+      <ActionCard
+        title="Update Attributes"
+        description="Manage key-value pairs for participant attributes"
+        action={async () => {
+          if (!localParticipant) throw new Error("Participant not found");
+          const attributesObj = Object.fromEntries(attributes);
+          return updateParticipant({
+            roomName: room.name,
+            identity: localParticipant.identity as string,
+            options: { attributes: attributesObj },
+          });
+        }}
+        disabled={attributes.length === 0}
+      >
+        <div className="space-y-4 bg-red-500">
+          <JsonEditor />
+        </div>
+      </ActionCard>
+
+      {/* Metadata Update Card */}
+      <ActionCard
+        title="Update Metadata"
+        description="Modify participant metadata string"
+        action={async () => {
+          if (!localParticipant) throw new Error("Participant not found");
+          return updateParticipant({
+            roomName: room.name,
+            identity: localParticipant.identity as string,
+            options: { metadata: metadataInput },
+          });
+        }}
+        disabled={!metadataInput || metadataInput === localParticipant?.metadata}
+      >
+        <div className="space-y-4">
+          <Textarea
+            value={metadataInput}
+            onChange={(e) => setMetadataInput(e.target.value)}
+            placeholder="Enter metadata (JSON recommended)"
+            rows={4}
+          />
+          {localParticipant?.metadata && (
+            <div className="text-sm text-muted-foreground">
+              Current metadata: {localParticipant.metadata}
+            </div>
+          )}
+        </div>
+      </ActionCard>
+
+      {/* Permissions Update Card */}
+      <ActionCard
+        title="Update Permissions"
+        description="Modify participant permissions"
+        action={async () => {
+          if (!localParticipant) throw new Error("Participant not found");
+          return updateParticipant({
+            roomName: room.name,
+            identity: localParticipant.identity as string,
+            options: { permission: permissions },
+          });
+        }}
+        disabled={JSON.stringify(permissions) === JSON.stringify(localParticipant?.permissions)}
+      >
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="canPublish"
+              checked={permissions.canPublish}
+              onCheckedChange={(c) => setPermissions((p) => ({ ...p, canPublish: !!c }))}
             />
+            <Label htmlFor="canPublish">Can Publish Media</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="canSubscribe"
+              checked={permissions.canSubscribe}
+              onCheckedChange={(c) => setPermissions((p) => ({ ...p, canSubscribe: !!c }))}
+            />
+            <Label htmlFor="canSubscribe">Can Subscribe</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="canPublishData"
+              checked={permissions.canPublishData}
+              onCheckedChange={(c) => setPermissions((p) => ({ ...p, canPublishData: !!c }))}
+            />
+            <Label htmlFor="canPublishData">Can Send Data</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="canUpdateMetadata"
+              checked={permissions.canUpdateMetadata}
+              onCheckedChange={(c) => setPermissions((p) => ({ ...p, canUpdateMetadata: !!c }))}
+            />
+            <Label htmlFor="canUpdateMetadata">Can Update Metadata</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="hidden"
+              checked={permissions.hidden}
+              onCheckedChange={(c) => setPermissions((p) => ({ ...p, hidden: !!c }))}
+            />
+            <Label htmlFor="hidden">Hide Participant</Label>
           </div>
         </div>
       </ActionCard>

@@ -64,7 +64,7 @@ export const ConsoleContainer: React.FC<React.HTMLAttributes<HTMLDivElement>> = 
           <ResizablePanel className="pt-4 flex flex-col" minSize={10} maxSize={60} collapsible>
             <ResizablePanelGroup direction="vertical">
               <ResizablePanel>
-                <div className="h-full flex flex-col min-w-[500px]">
+                <div className="h-full flex flex-col min-w-[500px] min-h-[300px]">
                   {/* Actions */}
                   <div className="px-4 flex items-center justify-between gap-2 pb-4 border-b">
                     <LevelFilter
