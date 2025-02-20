@@ -1,9 +1,9 @@
 import { ObservableWrapper } from "@/components/observable-wrapper";
 import { RecAvatar } from "@/components/rec-avatar";
 import { useLivekitParticipantState, useLivekitState } from "@/hooks/use-livekit/use-livekit-state";
+import { useSelectRemoteParticipant } from "@/hooks/use-select-remote-participant";
 import { cn, formatDate, withExcludedKeys, withIncludedKeys } from "@/lib/utils";
 import { RemoteParticipant } from "livekit-client";
-import { useEffect, useState } from "react";
 import { ParticipantTrackViewer } from "./participant-track-viewer";
 import { ParticipantViewer } from "./participant-viewer";
 
@@ -12,26 +12,7 @@ export const RemoteParticipantsViewer = () => {
     remoteParticipants: { remoteParticipants, activeSpeakerIdentities },
   } = useLivekitState();
 
-  const [selectedParticipant, setSelectedParticipant] = useState<RemoteParticipant | undefined>(
-    undefined
-  );
-
-  useEffect(() => {
-    if (remoteParticipants.length > 0 && !selectedParticipant) {
-      setSelectedParticipant(remoteParticipants[0]);
-      return;
-    }
-
-    if (remoteParticipants.length === 0 && selectedParticipant) {
-      setSelectedParticipant(undefined);
-      return;
-    }
-
-    if (selectedParticipant && !remoteParticipants.includes(selectedParticipant)) {
-      setSelectedParticipant(undefined);
-      return;
-    }
-  }, [remoteParticipants, selectedParticipant]);
+  const { selectedParticipant, setSelectedParticipant } = useSelectRemoteParticipant();
 
   const remoteParticipantIdentities = remoteParticipants.map((p) => p.identity);
 
@@ -51,7 +32,7 @@ export const RemoteParticipantsViewer = () => {
                   setSelectedParticipant(remoteParticipants.find((p) => p.identity === identity))
                 }
                 className={cn(
-                  "w-full flex items-center gap-3 p-3 px-4 rounded-lg transition-colors",
+                  "w-full flex items-center gap-3 p-3 px-4 rounded-lg transition-colors min-w-48",
                   "hover:bg-muted/50",
                   selectedParticipant?.identity === identity && "bg-muted"
                 )}

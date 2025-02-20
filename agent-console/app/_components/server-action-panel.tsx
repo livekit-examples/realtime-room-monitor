@@ -3,11 +3,8 @@ import { TabValue, useTabs } from "@/hooks/use-tabs";
 import { cn } from "@/lib/utils";
 import { useMemo } from "react";
 import { ParticipantActionPanel } from "./participant-action-panel";
+import { RemoteParticipantsActionPanel } from "./remote-participants-action-panel";
 import { RoomActionPanel } from "./room-action-panel";
-
-const RemoteParticipantActionPanel = () => {
-  return <div>RemoteParticipantActionPanel</div>;
-};
 
 const VideoTrackActionPanel = () => {
   return <div>VideoTrackActionPanel</div>;
@@ -16,7 +13,7 @@ const VideoTrackActionPanel = () => {
 const tabValueToPanelMap: Record<TabValue, React.FC> = {
   room: RoomActionPanel,
   "local-participant": ParticipantActionPanel,
-  "remote-participants": RemoteParticipantActionPanel,
+  "remote-participants": RemoteParticipantsActionPanel,
   videos: VideoTrackActionPanel,
 };
 

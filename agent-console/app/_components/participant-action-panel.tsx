@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useLivekitAction, useLivekitParticipantState, useLivekitState } from "@/hooks/use-livekit";
 import { useLocalParticipant } from "@livekit/components-react";
+import { Participant } from "livekit-client";
 import { ParticipantPermission } from "livekit-server-sdk";
 import { useEffect, useMemo, useState } from "react";
 
@@ -21,13 +22,18 @@ const getPermission = (permissions: ParticipantPermission | undefined) => {
 
 export const ParticipantActionPanel = () => {
   const { localParticipant } = useLocalParticipant();
+
+  return <ParticipantActionPanelInner participant={localParticipant} />;
+};
+
+export const ParticipantActionPanelInner = ({ participant }: { participant: Participant }) => {
   const {
     permissions: initialPermissions,
     identity,
     name,
     metadata,
     attributes: initialAttributes,
-  } = useLivekitParticipantState(localParticipant);
+  } = useLivekitParticipantState(participant);
 
   const { room } = useLivekitState();
   const { updateParticipant } = useLivekitAction();
@@ -89,14 +95,6 @@ export const ParticipantActionPanel = () => {
     updated[newKey] = newValue;
     setAttributes(updated);
     setDuplicateError(null);
-  };
-
-  const handleRemoveAttribute = (key: string) => {
-    setAttributes((prev) => {
-      const attrs = { ...prev };
-      delete attrs[key];
-      return attrs;
-    });
   };
 
   return (
