@@ -15,8 +15,8 @@ export function getLiveKitCredentials() {
   return { API_KEY, API_SECRET, LIVEKIT_URL };
 }
 
-export async function getLiveKitCredentialsFromRequest(request: Request) {
-  const { API_KEY, API_SECRET, LIVEKIT_URL } = await request.json();
+export async function getLiveKitCredentialsFromRequest(requestJson: any) {
+  const { LIVEKIT_URL, LIVEKIT_API_KEY: API_KEY, LIVEKIT_API_SECRET: API_SECRET } = requestJson;
 
   if (!API_KEY || !API_SECRET || !LIVEKIT_URL) {
     const missing: string[] = [];

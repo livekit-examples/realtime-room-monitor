@@ -4,8 +4,9 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {
-    const { API_KEY, API_SECRET, LIVEKIT_URL } = await getLiveKitCredentialsFromRequest(request);
-    const { roomName, identity } = await request.json();
+    const req = await request.json();
+    const { API_KEY, API_SECRET, LIVEKIT_URL } = await getLiveKitCredentialsFromRequest(req);
+    const { roomName, identity } = req;
 
     if (!roomName || !identity) {
       return new NextResponse("Missing roomName or identity", { status: 400 });

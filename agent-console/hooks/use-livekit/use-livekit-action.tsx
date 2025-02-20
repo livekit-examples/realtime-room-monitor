@@ -11,20 +11,6 @@ import { useCallback } from "react";
 import { useCredentials } from "../use-credentials";
 import { useConnectionDetails } from "./use-conn-details";
 
-const handleUpdateParticipant = async (req: UpdateParticipantRequest) => {
-  const url = new URL("/api/room/update-participant", window.location.origin);
-  const response = await fetch(url.toString(), {
-    method: "POST",
-    body: JSON.stringify(req),
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to update participant");
-  }
-
-  return response.json();
-};
-
 export const useLivekitAction = () => {
   const room = useRoomContext();
   const { roomName, userId } = useRoomInfo();
@@ -33,14 +19,15 @@ export const useLivekitAction = () => {
 
   const handleConnect = useCallback(async () => {
     const url = new URL("/api/token", window.location.origin);
+    console.log("credentials", { roomName, userId, ...credentials });
+    const response = await fetch(url.toString(), {
+      method: "POST",
+      body: JSON.stringify({ roomName, userId, ...credentials }),
+    });
 
-    url.searchParams.set("roomName", roomName);
-    url.searchParams.set("userId", userId);
-
-    const response = await fetch(url.toString());
     const connectionDetailsData = await response.json();
     updateConnectionDetails(connectionDetailsData);
-  }, [roomName, updateConnectionDetails, userId]);
+  }, [roomName, updateConnectionDetails, userId, credentials]);
 
   const handleDisconnect = useCallback(async () => {
     if (room) await room.disconnect();
@@ -56,6 +43,20 @@ export const useLivekitAction = () => {
 
     if (!response.ok) {
       throw new Error("Failed to mute track");
+    }
+
+    return response.json();
+  };
+
+  const handleUpdateParticipant = async (req: UpdateParticipantRequest) => {
+    const url = new URL("/api/room/update-participant", window.location.origin);
+    const response = await fetch(url.toString(), {
+      method: "POST",
+      body: JSON.stringify({ ...req, ...credentials }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update participant");
     }
 
     return response.json();

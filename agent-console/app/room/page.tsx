@@ -46,7 +46,7 @@ export default function Page() {
         }}
       >
         <LivekitEventInstrumentor>
-          <div className="flex flex-row justify-between p-3 px-2 pb-1">
+          <div className="flex flex-row justify-between items-center p-3 px-2 pb-1">
             <LK />
             <div className="flex flex-row gap-2">
               <CredentialSettings />

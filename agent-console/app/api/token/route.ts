@@ -11,12 +11,11 @@ export type ConnectionDetails = {
   participantToken: string;
 };
 
-export async function GET(request: Request) {
+export async function POST(request: Request) {
   try {
-    const { API_KEY, API_SECRET, LIVEKIT_URL } = await getLiveKitCredentialsFromRequest(request);
-    const { searchParams } = new URL(request.url);
-    const roomName = searchParams.get("roomName");
-    const userId = searchParams.get("userId");
+    const req = await request.json();
+    const { roomName, userId } = req;
+    const { API_KEY, API_SECRET, LIVEKIT_URL } = await getLiveKitCredentialsFromRequest(req);
 
     if (!roomName || !userId) {
       throw new Error("Missing roomName or userId parameters");
