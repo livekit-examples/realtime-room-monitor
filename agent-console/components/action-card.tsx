@@ -23,20 +23,12 @@ export const ActionCard = ({
 }: ActionCardProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [response, setResponse] = useState<object | null>(null);
-  const [error, setError] = useState<Error | null>(null);
 
   const handleActionImpl = useCallback(async () => {
     try {
       setIsLoading(true);
-      setError(null);
       const result = await action();
       setResponse(result);
-      toast.success("Action completed successfully");
-    } catch (err) {
-      setError(err as Error);
-      toast.error("Action failed", {
-        description: (err as Error).message,
-      });
     } finally {
       setIsLoading(false);
     }
@@ -46,7 +38,10 @@ export const ActionCard = ({
     toast.promise(handleActionImpl, {
       loading: "Processing...",
       success: "Action completed successfully",
-      error: "Action failed",
+      error: (error) => {
+        console.error(error);
+        return error instanceof Error ? error.message : "Action failed";
+      },
     });
   }, [handleActionImpl]);
 
@@ -64,9 +59,9 @@ export const ActionCard = ({
           {isLoading ? "Processing..." : "Perform Action"}
         </Button>
 
-        {(response || error) && (
+        {response && (
           <div className="mt-4 space-y-2">
-            <JsonPreview title={error ? "Error Details" : "Response"} data={error || response} />
+            <JsonPreview title="Response" data={response} />
           </div>
         )}
       </div>

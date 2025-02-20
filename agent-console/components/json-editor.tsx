@@ -17,7 +17,7 @@ const darkEditorTheme: editor.IStandaloneThemeData = {
 };
 
 interface JsonEditorProps {
-  value?: string;
+  value: string;
   onChange?: (value: string) => void;
   className?: string;
 }
@@ -30,6 +30,7 @@ export const JsonEditor = ({ value = "{}", onChange, className }: JsonEditorProp
   const [lineCount, setLineCount] = useState(1);
   const lineHeight = 19; // Monaco's default line height
   const padding = 30;
+  const [validationErrors, setValidationErrors] = useState<editor.IMarker[]>([]);
 
   useEffect(() => {
     if (monaco) {
@@ -48,22 +49,29 @@ export const JsonEditor = ({ value = "{}", onChange, className }: JsonEditorProp
     setLineCount(Math.max(lines, 1));
   }, [localValue]);
 
-  const editorHeight = Math.min(Math.max(lineCount * lineHeight + padding, 50), 300);
-
   const handleValidate = (markers: editor.IMarker[]) => {
     setIsValid(markers.length === 0);
+    setValidationErrors(markers);
   };
 
   return (
-    <div className={cn("w-full flex flex-col gap-2", className)}>
-      <div style={{ height: editorHeight }}>
+    <div className={cn("w-full flex flex-col gap-2 group", className)}>
+      <div
+        className={cn(
+          "border rounded-lg overflow-hidden",
+          "border-border dark:border-muted",
+          "transition-colors relative pt-2",
+          !isValid ? "border-red-500/50" : "hover:border-foreground/30"
+        )}
+      >
         <Editor
+          className="w-full absolute inset-0"
+          height={100}
           defaultLanguage="json"
           language="json"
           theme={theme === "dark" ? "customDarkTheme" : "vs-light"}
           value={localValue}
           options={{
-            minimap: { enabled: false },
             formatOnPaste: true,
             formatOnType: true,
             autoClosingBrackets: "always",
@@ -71,20 +79,27 @@ export const JsonEditor = ({ value = "{}", onChange, className }: JsonEditorProp
             lineNumbers: "on",
             roundedSelection: false,
             automaticLayout: true,
+            scrollbar: {
+              verticalScrollbarSize: 8,
+              horizontalScrollbarSize: 8,
+            },
+            renderLineHighlight: "none",
+            overviewRulerBorder: false,
+            hideCursorInOverviewRuler: true,
           }}
           onChange={(val) => {
             setLocalValue(val || "");
+            onChange?.(val || "");
           }}
           onValidate={handleValidate}
           beforeMount={(monaco) => {
             monaco.editor.defineTheme("customDarkTheme", darkEditorTheme);
           }}
-          height={editorHeight + "px"}
         />
       </div>
       {!isValid && (
         <div className="animate-in fade-in slide-in-from-bottom-2">
-          <div className="rounded-lg border border-red-500/50 bg-red-50 px-4 py-3 text-red-600">
+          <div className="rounded-lg border border-red-500/50 px-4 py-3 text-red-600">
             <div className="flex gap-3">
               <CircleAlert
                 className="mt-0.5 shrink-0 opacity-60"
@@ -93,11 +108,19 @@ export const JsonEditor = ({ value = "{}", onChange, className }: JsonEditorProp
                 aria-hidden="true"
               />
               <div className="grow space-y-1">
-                <p className="text-sm font-medium">Invalid JSON structure:</p>
+                <p className="text-sm font-medium">
+                  Invalid JSON ({validationErrors.length} issue
+                  {validationErrors.length > 1 ? "s" : ""} found):
+                </p>
                 <ul className="list-inside list-disc text-sm opacity-80">
-                  <li>Check for proper quotation marks</li>
-                  <li>Verify all commas are in place</li>
-                  <li>Ensure proper bracket alignment</li>
+                  {validationErrors.slice(0, 3).map((error, index) => (
+                    <li key={index}>
+                      Line {error.startLineNumber}: {error.message}
+                    </li>
+                  ))}
+                  {validationErrors.length > 3 && (
+                    <li>...and {validationErrors.length - 3} more issues</li>
+                  )}
                 </ul>
               </div>
             </div>
