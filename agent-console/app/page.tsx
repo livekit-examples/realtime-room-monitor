@@ -117,7 +117,7 @@ export default function Page() {
 
           <div className="pt-4 border-t">
             <a
-              href="https://github.com/LeetMock/voxant"
+              href="https://github.com/livekit-examples/realtime-room-monitor"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 text-muted-foreground hover:text-primary transition-colors"
