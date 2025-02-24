@@ -1,5 +1,11 @@
-class Context:
+from typing import Generic, Type
 
-    def __init__(self): ...
+from pydantic import BaseModel, Field
+from voxant.graph.types import TState
 
-    def ready(self) -> bool: ...
+
+class Context(BaseModel, Generic[TState]):
+
+    state_schema: Type[TState] = Field(
+        ..., description="The state schema of the agent executor"
+    )
