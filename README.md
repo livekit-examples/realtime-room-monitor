@@ -30,6 +30,29 @@ Hosted [here](https://v0-webq-gt7ld1dd0st.vercel.app/)
 
 See [agent-console/README.md](./agent-console/README.md)
 
+## How to Observe the log events from a simple pipeline agent
+
+1. Run the `agent-console` frontend locally.
+
+```bash
+cd agent-console
+npm i
+npm run dev
+```
+
+2. Install `uv` package manager and run the pipeline agent locally.
+
+```bash
+pip install uv
+```
+
+3. Run the pipeline agent locally.
+
+```bash
+cd agent-examples
+make run-pipeline-agent
+```
+
 **Extending & Customizing the Agent Console**
 
 The codebase of the frontend is been made to encourage extensibility and customization for individual's own purposes.
