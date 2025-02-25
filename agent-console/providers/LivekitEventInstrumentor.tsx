@@ -1,12 +1,12 @@
 import { useLogger } from "@/hooks/use-logger";
-import { EventRegistry, roomEventRegistry } from "@/lib/event-definitions";
+import { EventRegistry, eventRegistryConfig } from "@/lib/event-definitions";
 import { roomEventCallbackData, RoomEventCallbackData } from "@/lib/event-types";
 import { useRoomContext } from "@livekit/components-react";
 import { useEffect } from "react";
 
 const roomEventCallbackDataValues = Object.entries(roomEventCallbackData).filter(
   ([eventType, _]) => {
-    return eventType in roomEventRegistry;
+    return eventType in eventRegistryConfig;
   }
 ) as [keyof EventRegistry, RoomEventCallbackData[keyof RoomEventCallbackData]][];
 
