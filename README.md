@@ -30,7 +30,7 @@ Hosted [here](https://v0-webq-gt7ld1dd0st.vercel.app/)
 
 See [agent-console/README.md](./agent-console/README.md)
 
-## How to Observe the log events from a simple pipeline agent
+## How to Observe the Log Events from a Simple Pipeline Agent
 
 1. Run the `agent-console` frontend locally.
 
@@ -50,10 +50,11 @@ pip install uv
 
 ```bash
 cd agent-examples
+uv sync
 make run-pipeline-agent
 ```
 
-**Extending & Customizing the Agent Console**
+## **Extending & Customizing the Agent Console**
 
 The codebase of the frontend is been made to encourage extensibility and customization for individual's own purposes.
 
