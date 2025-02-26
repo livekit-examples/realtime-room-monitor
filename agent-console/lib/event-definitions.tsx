@@ -4,7 +4,7 @@ import { EventLevel, EventSource, isAgent, RoomEventCallbackData } from "./event
 
 type RoomEventReturn<T extends keyof RoomEventCallbackData> = ReturnType<RoomEventCallbackData[T]>;
 
-export const roomEventRegistry = {
+export const eventRegistryConfig = {
   connected: defineEvent<RoomEventReturn<"connected">>({
     level: EventLevel.Info,
     source: EventSource.Client,
@@ -332,4 +332,4 @@ export const roomEventRegistry = {
   }),
 };
 
-export type EventRegistry = typeof roomEventRegistry;
+export type EventRegistry = typeof eventRegistryConfig;
