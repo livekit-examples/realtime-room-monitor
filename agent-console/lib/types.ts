@@ -10,6 +10,12 @@ export interface RemoveParticipantRequest {
   identity: string;
 }
 
+export interface MoveParticipantRequest {
+  roomName: string;
+  identity: string;
+  destinationRoom: string;
+}
+
 export interface MuteTrackRequest {
   roomName: string;
   identity: string;

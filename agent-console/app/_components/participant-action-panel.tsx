@@ -38,7 +38,7 @@ export const ParticipantActionPanelInner = ({ participant }: { participant: Part
   const isRemoteParticipant = useMemo(() => !isLocalParticipant(participant), [participant]);
 
   const { room } = useLivekitState();
-  const { updateParticipant, removeParticipant } = useLivekitAction();
+  const { updateParticipant, removeParticipant, moveParticipant } = useLivekitAction();
 
   // Name Update
   const [nameInput, setNameInput] = useState(name || "");
@@ -55,6 +55,9 @@ export const ParticipantActionPanelInner = ({ participant }: { participant: Part
 
   // Permissions Update
   const [permissions, setPermissions] = useState(getPermission(initialPermissions));
+
+  // Move Participant
+  const [destinationRoom, setDestinationRoom] = useState("");
 
   useEffect(() => {
     setAttributes(initialAttributes || {});
@@ -291,6 +294,35 @@ export const ParticipantActionPanelInner = ({ participant }: { participant: Part
           </div>
         </div>
       </ActionCard>
+
+      {isRemoteParticipant && (
+        <ActionCard
+          title="Move Participant"
+          description="Move participant to a different room (LiveKit Cloud only)"
+          action={async () => {
+            if (!identity) throw new Error("Participant not found");
+
+            return moveParticipant({
+              roomName: room.name,
+              identity: identity as string,
+              destinationRoom,
+            });
+          }}
+          disabled={!destinationRoom || destinationRoom === room.name}
+        >
+          <div className="space-y-2">
+            <Input
+              value={destinationRoom}
+              onChange={(e) => setDestinationRoom(e.target.value)}
+              placeholder="Destination room name"
+            />
+            <p className="text-sm text-muted-foreground">
+              Participant <span className="font-medium">{identity}</span> will be removed from{" "}
+              <span className="font-medium">{room.name}</span> and added to the destination room.
+            </p>
+          </div>
+        </ActionCard>
+      )}
 
       {isRemoteParticipant && (
         <ActionCard

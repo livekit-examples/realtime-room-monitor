@@ -1,5 +1,6 @@
 import { useRoomInfo } from "@/hooks/use-room-info";
 import {
+  MoveParticipantRequest,
   MuteTrackRequest,
   RemoveParticipantRequest,
   SendDataRequest,
@@ -75,6 +76,20 @@ export const useLivekitAction = () => {
     return response.json();
   };
 
+  const handleMoveParticipant = async (req: MoveParticipantRequest) => {
+    const url = new URL("/api/room/move-participant", window.location.origin);
+    const response = await fetch(url.toString(), {
+      method: "POST",
+      body: JSON.stringify({ ...req, ...credentials }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to move participant");
+    }
+
+    return response.json();
+  };
+
   const handleSendData = async (req: SendDataRequest) => {
     const url = new URL("/api/room/send-data", window.location.origin);
     const response = await fetch(url.toString(), {
@@ -108,6 +123,7 @@ export const useLivekitAction = () => {
     disconnect: handleDisconnect,
     muteTrack: handleMuteTrack,
     removeParticipant: handleRemoveParticipant,
+    moveParticipant: handleMoveParticipant,
     sendData: handleSendData,
     updateRoomMetadata: handleUpdateRoomMetadata,
     updateParticipant: handleUpdateParticipant,
